@@ -2003,6 +2003,52 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     }
     nodesOut.close();
     edgesOut.close();
+
+    fileName  = "Incident_Attributes_Matrix.csv";
+    filePath = path;
+    filePath.append(fileName);
+    std::ofstream matrixOut(filePath.toStdString().c_str());
+    std::vector <std::vector <std::string> >::iterator attIt;
+    matrixOut << ","; // First we have an empty cell for the matrix
+    // Then we print the column names, which are the names of all attributes.
+    for (attIt = assignedIncidentAttributes.begin(); attIt != assignedIncidentAttributes.end();attIt++) {
+      if (attIt != assignedIncidentAttributes.end() - 1) {
+	matrixOut << *attIt->begin() << ",";
+      } else {
+	matrixOut << *attIt->begin() << "\n";
+      }
+    }
+    // Then we write each row.
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != rowData.size(); i++) {
+      // We output the current incident id.
+      matrixOut << i + 1 << ",";
+      for (attIt = assignedIncidentAttributes.begin(); attIt != assignedIncidentAttributes.end(); attIt++) {
+	std::string value = "0";
+	std::vector <std::string>::iterator attIt2;
+	for (attIt2 = attIt->begin() + 1; attIt2 != attIt->end(); attIt2++) {
+	  std::vector <std::vector <std::string> >::size_type currentIncident = 0;
+	  std::istringstream ss(*attIt2);
+	  ss >> currentIncident;
+	  if (currentIncident == i) {
+	  	    value = "1";
+	    // Now we need to check if we want to assign a value or just a 1;
+	    std::vector <std::vector <std::string> >::iterator valIt;
+	    for (valIt = incidentValues.begin(); valIt != incidentValues.end(); valIt++) {
+	      if (*valIt->begin() == *attIt->begin() && *(valIt->begin() + 1) == *attIt2) {
+		value = *(valIt->begin() + 2);
+	      }
+	    }
+	  }
+	}
+	if (attIt != assignedIncidentAttributes.end() - 1) {
+	  matrixOut << value << ",";
+	} else {
+	  matrixOut << value << "\n";
+	} 
+      }
+    }
+    matrixOut.close();
+    
     if (incidentCategoriesBool == true) {
       fileName  = "Incident_Categories_Nodes.csv";
       filePath = path;
@@ -2183,7 +2229,63 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     }
     eaNodesOut.close();
     eaEdgesOut.close();
+
+    fileName  = "Entity_Attributes_Matrix.csv";
+    filePath = path;
+    filePath.append(fileName);
+    std::ofstream matrixOut(filePath.toStdString().c_str());
+    std::vector <std::vector <std::string> >::iterator attIt;
+    matrixOut << ","; // First we have an empty cell for the matrix
+    // Then we print the column names, which are the names of all attributes.
+    for (attIt = assignedEntityAttributes.begin(); attIt != assignedEntityAttributes.end();attIt++) {
+      if (attIt != assignedEntityAttributes.end() - 1) {
+	matrixOut << *attIt->begin() << ",";
+      } else {
+	matrixOut << *attIt->begin() << "\n";
+      }
+    }
+    // Then we write each row.
+    std::vector <std::vector <std::string> >::iterator entIt;
+    for (entIt = entities.begin(); entIt != entities.end(); entIt++) {
+      bool found = false;
+      std::vector <std::vector <std::string> >::iterator relIt;
+      for (relIt = assignedRelationships.begin(); relIt != assignedRelationships.end(); relIt++) {
+	// First we do entity one in this relationship
+	std::vector <std::vector <std::string> >::iterator relIt2;
+	for (relIt2 = relationships.begin(); relIt2 != relationships.end(); relIt2++) {
+	  if (*relIt->begin() == *relIt2->begin()) {
+	    if ((*entIt->begin() ==  *(relIt2->begin() + 1) || *entIt->begin() == *(relIt2->begin() + 3)) && found == false) {
+	      found = true;
+	      matrixOut << *entIt->begin() << ",";
+	      for (attIt = assignedEntityAttributes.begin(); attIt != assignedEntityAttributes.end(); attIt++) {
+		std::string value = "0";
+		std::vector <std::string>::iterator attIt2;
+		for (attIt2 = attIt->begin() + 1; attIt2 != attIt->end(); attIt2++) {
+		  if (*attIt2 == *entIt->begin()) {
+		    value = "1";
+		    // Now we need to check if we want to assign a value or just a 1;
+		    std::vector <std::vector <std::string> >::iterator valIt;
+		    for (valIt = entityValues.begin(); valIt != entityValues.end(); valIt++) {
+		      if (*valIt->begin() == *attIt->begin() && *(valIt->begin() + 1) == *attIt2) {
+			value = *(valIt->begin() + 2);
+		      }
+		    }
+		  }
+		}
+		if (attIt != assignedEntityAttributes.end() - 1) {
+		  matrixOut << value << ",";
+		} else {
+		  matrixOut << value << "\n";
+		} 
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    matrixOut.close();
   }
+  
   if (entityCategoriesBool == true) {
     fileName = "Entity_Categories_Nodes.csv";
     filePath = path;

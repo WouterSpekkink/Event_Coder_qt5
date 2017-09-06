@@ -95,7 +95,7 @@ AttributesDialog::AttributesDialog(QWidget *parent, DataInterface *interface,
   descriptionField->installEventFilter(this);
    
   attributeCategoriesLabel = new QLabel(tr("Categories:"));
-  categoriesPoolLabel = new QLabel(tr("Categories pool:"));
+  categoriesPoolLabel = new QLabel(tr("Category pool:"));
   assignCategoryButton = new QPushButton("<<");
   unassignCategoryButton = new QPushButton(">>");
   assignedCategoriesListWidget = new QListWidget();

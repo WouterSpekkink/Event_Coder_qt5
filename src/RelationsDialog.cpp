@@ -621,12 +621,25 @@ void RelationsDialog::saveAndClose() {
     }
     std::string label = selectedSourceLabel->text().toStdString() + tail +
       selectedTypeLabel->text().toStdString() + head + selectedTargetLabel->text().toStdString();
+    std::string altLabel = selectedTargetLabel->text().toStdString() + tail +
+      selectedTypeLabel->text().toStdString() + head + selectedSourceLabel->text().toStdString();
+
     tempRelationship.push_back(label);
     tempRelationship.push_back(selectedSourceLabel->text().toStdString());
     tempRelationship.push_back(selectedTypeLabel->text().toStdString());
     tempRelationship.push_back(selectedTargetLabel->text().toStdString());
     for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->relationships.size(); i++) {
       if (dataInterface->relationships[i][0] == label && dataInterface->relationships[i][0] != permanentLabel.toStdString()) {
+	QPointer <QMessageBox> warningBox = new QMessageBox;
+	warningBox->addButton(QMessageBox::Ok);
+	warningBox->setIcon(QMessageBox::Warning);
+	warningBox->setText("Relationship already exists.");
+	warningBox->setInformativeText("You cannot create two identical relationships.");
+	warningBox->exec();
+	return;
+      }
+      if (dataInterface->relationships[i][0] == altLabel &&
+	  currentDirectedness == UNDIRECTED) {
 	QPointer <QMessageBox> warningBox = new QMessageBox;
 	warningBox->addButton(QMessageBox::Ok);
 	warningBox->setIcon(QMessageBox::Warning);

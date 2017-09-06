@@ -865,6 +865,8 @@ void MainDialog::unassignAttribute() {
 	std::vector<std::string> currentAssigned = *it;
 	if (currentAssigned.size() < 2) {
 	  dataInterface->assignedIncidentAttributes.erase(it);
+	} else {
+	  it++;
 	}
       }
       for (it = dataInterface->incidentValues.begin(); it != dataInterface->incidentValues.end();) {

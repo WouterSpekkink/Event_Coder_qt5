@@ -909,7 +909,7 @@ void DataInterface::readSave(const QString &fileName) {
       }
     case relationMemosField:
       {
-	if (buffer != MEMOS_BEGIN && buffer != MEMOS_END) {
+	if (buffer != RELATIONMEMOS_BEGIN && buffer != RELATIONMEMOS_END) {
 	  std::istringstream stringStream(buffer);
 	  while (stringStream) {
 	    std::vector<std::string> tempMemo;
@@ -928,14 +928,16 @@ void DataInterface::readSave(const QString &fileName) {
       }
     case eventFlagsField:
       {
-	std::istringstream stringStream(buffer);
-	while(stringStream) {
-	  std::string s;
-	  if (!getline(stringStream, s, ';')) break;
-	  if (s == "1") {
-	    eventFlagIndex.push_back(true);
-	  } else if (s == "0") {
-	    eventFlagIndex.push_back(false);
+	if (buffer != EVENTFLAGS_BEGIN && buffer != EVENTFLAGS_END) {
+	  std::istringstream stringStream(buffer);
+	  while(stringStream) {
+	    std::string s;
+	    if (!getline(stringStream, s, ';')) break;
+	    if (s == "1") {
+	      eventFlagIndex.push_back(true);
+	    } else if (s == "0") {
+	      eventFlagIndex.push_back(false);
+	    }
 	  }
 	}
 	break;
@@ -1279,7 +1281,7 @@ void DataInterface::importCodes(const QString &fileName) {
  
   // Then we read all the lines of data in the input file.
   while(myFile) {
-    // The buffer will hold one line of raw data temporarily, and we will do some processing on it.
+    The buffer will hold one line of raw data temporarily, and we will do some processing on it.
     std::string buffer;
    
     if (!getline(myFile, buffer)) break;

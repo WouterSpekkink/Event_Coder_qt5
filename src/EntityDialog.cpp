@@ -80,7 +80,7 @@ EntityDialog::EntityDialog(QWidget *parent, DataInterface *interface, const QStr
   valueField->installEventFilter(this);
 
   entityAttributesLabel = new QLabel(tr("Entity Attributes:"));
-  attributesPoolLabel = new QLabel(tr("Attributes pool:"));
+  attributesPoolLabel = new QLabel(tr("Attribute pool:"));
   entityAttributesListWidget = new QListWidget();
   attributesPoolListWidget = new QListWidget();
   assignAttributeButton = new QPushButton("<<");

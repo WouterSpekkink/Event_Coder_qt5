@@ -39,6 +39,8 @@
     "sec:navigatingdata"
     "fig:incidentsoverview"
     "sec:markingincidents"
+    "sec:attributes"
+    "sec:relationships"
     "chap:contactdetails"))
  :latex)
 

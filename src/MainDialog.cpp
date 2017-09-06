@@ -80,10 +80,10 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   exportDataLabel->setAlignment(Qt::AlignHCenter);
   exportDataButton = new QPushButton(tr("Open export dialog"));
 
-  previousEventButton = new QPushButton(tr("Previous event"));
-  nextEventButton = new QPushButton(tr("Next event"));
-  previousFlaggedButton = new QPushButton(tr("Previous flagged event"));
-  nextFlaggedButton = new QPushButton(tr("Next flagged event"));
+  previousEventButton = new QPushButton(tr("Previous incident"));
+  nextEventButton = new QPushButton(tr("Next incident"));
+  previousFlaggedButton = new QPushButton(tr("Previous flagged incident"));
+  nextFlaggedButton = new QPushButton(tr("Next flagged incident"));
   indexIndicatorLabel = new QLabel(tr("Incident ( / )"));
   eventFlagLabel = new QLabel("");
   jumpToButton = new QPushButton(tr("Jump to"));

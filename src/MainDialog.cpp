@@ -780,101 +780,107 @@ void MainDialog::setRightEventField(const QString &selection) {
 }
 
 void MainDialog::assignAttribute() {
-  std::vector <std::vector <std::string> >::iterator sIt;
-  bool foundAttribute = false;
-  bool foundEvent = false;
-  std::vector <std::vector <std::string> >::size_type attributeIndex;
-  for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedIncidentAttributes.size(); i++) {
-    std::vector<std::string> currentGroup = dataInterface->assignedIncidentAttributes[i];
-    if (currentGroup[0] == currentAttribute.toStdString()) {
-      foundAttribute = true;
-      attributeIndex = i;
-      std::vector<std::string>::iterator pIt;
-      for (pIt = currentGroup.begin() + 1; pIt != currentGroup.end(); pIt++) {
-	std::vector <std::vector <std::string> >::size_type currentIndex;
-	std::istringstream (*pIt) >> currentIndex;
-	if (currentIndex == eventIndex) {
-	  foundEvent = true;
+  if (currentAttribute != "") {
+    std::vector <std::vector <std::string> >::iterator sIt;
+    bool foundAttribute = false;
+    bool foundEvent = false;
+    std::vector <std::vector <std::string> >::size_type attributeIndex;
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedIncidentAttributes.size(); i++) {
+      std::vector<std::string> currentGroup = dataInterface->assignedIncidentAttributes[i];
+      if (currentGroup[0] == currentAttribute.toStdString()) {
+	foundAttribute = true;
+	attributeIndex = i;
+	std::vector<std::string>::iterator pIt;
+	for (pIt = currentGroup.begin() + 1; pIt != currentGroup.end(); pIt++) {
+	  std::vector <std::vector <std::string> >::size_type currentIndex;
+	  std::istringstream (*pIt) >> currentIndex;
+	  if (currentIndex == eventIndex) {
+	    foundEvent = true;
+	  }
 	}
       }
     }
-  }
-  if (!foundAttribute) {
-    std::vector <std::string> tempPair;
-    std::stringstream ss;
-    ss << eventIndex;
-    std::string newIndex = ss.str();
-    tempPair.push_back(currentAttribute.toStdString());
-    tempPair.push_back(newIndex);
-    dataInterface->assignedIncidentAttributes.push_back(tempPair);
-    QDateTime time = QDateTime::currentDateTime();
-    QString timeText = time.toString(Qt::TextDate);
-    QString newLog = timeText + " - " + "Assigned attribute " + currentAttribute + " to incident " + QString::number(eventIndex + 1);
-    logger->addToLog(newLog);
-  } else if (foundAttribute && !foundEvent) {
-    std::stringstream ss;
-    ss << eventIndex;
-    std::string newIndex = ss.str();
-    dataInterface->assignedIncidentAttributes[attributeIndex].push_back(newIndex);
-    QDateTime time = QDateTime::currentDateTime();
-    QString timeText = time.toString(Qt::TextDate);
-    QString newLog = timeText + " - " + "Assigned attribute " + currentAttribute + " to incident " + QString::number(eventIndex + 1);
-    logger->addToLog(newLog);
-  }
-  disableAttributeSelection();
-  updateTexts();
-}
-
-void MainDialog::unassignAttribute() {
-  std::vector <std::vector <std::string> >::iterator sIt;
-  std::vector<std::string>::size_type eraseIndex = 0;
-  bool foundAttribute = false;
-  bool foundEvent = false;
-  std::vector <std::vector <std::string> >::size_type attributeIndex;
-  for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedIncidentAttributes.size(); i++) {
-    std::vector<std::string> currentGroup = dataInterface->assignedIncidentAttributes[i];
-    if (currentGroup[0] == currentAttribute.toStdString()) {
-      foundAttribute = true;
-      attributeIndex = i;
-      for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
-	std::istringstream ss(currentGroup[j]);
-	std::vector <std::vector <std::string> >::size_type currentIndex;
-	ss >> currentIndex;
-	if (currentIndex == eventIndex) {
-	  foundEvent = true;
-	  eraseIndex = j;
-	}
-      }
-    }
-  }
-  if (foundAttribute && foundEvent) {
-    dataInterface->assignedIncidentAttributes[attributeIndex].erase(dataInterface->assignedIncidentAttributes[attributeIndex].begin()
-								    + eraseIndex);
-    QDateTime time = QDateTime::currentDateTime();
-    QString timeText = time.toString(Qt::TextDate);
-    QString newLog = timeText + " - " + "Unassigned attribute " + currentAttribute + " from incident " +
-      QString::number(eventIndex + 1);
-    logger->addToLog(newLog);
-    std::vector <std::vector <std::string> >::iterator it;
-    for (it = dataInterface->assignedIncidentAttributes.begin(); it != dataInterface->assignedIncidentAttributes.end();) {
-      std::vector<std::string> currentAssigned = *it;
-      if (currentAssigned.size() < 2) {
-	dataInterface->assignedIncidentAttributes.erase(it);
-      }
-    }
-    for (it = dataInterface->incidentValues.begin(); it != dataInterface->incidentValues.end();) {
-      std::vector<std::string> currentValue = *it;
+    if (!foundAttribute) {
+      std::vector <std::string> tempPair;
       std::stringstream ss;
       ss << eventIndex;
-      if (currentValue[0] == currentAttribute.toStdString() && currentValue[1] == ss.str()) {
-	dataInterface->incidentValues.erase(it);
-      } else {
-	it++;
+      std::string newIndex = ss.str();
+      tempPair.push_back(currentAttribute.toStdString());
+      tempPair.push_back(newIndex);
+      dataInterface->assignedIncidentAttributes.push_back(tempPair);
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "Assigned attribute " + currentAttribute + " to incident " + QString::number(eventIndex + 1) +
+ 	", while inspecting " + selectLeftEventComboBox->currentText() + " and " + selectRightEventComboBox->currentText();
+      logger->addToLog(newLog);
+    } else if (foundAttribute && !foundEvent) {
+      std::stringstream ss;
+      ss << eventIndex;
+      std::string newIndex = ss.str();
+      dataInterface->assignedIncidentAttributes[attributeIndex].push_back(newIndex);
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "Assigned attribute " + currentAttribute + " to incident " + QString::number(eventIndex + 1) +
+	", while inspecting " + selectLeftEventComboBox->currentText() + " and " + selectRightEventComboBox->currentText();
+      logger->addToLog(newLog);
+    }
+    disableAttributeSelection();
+    updateTexts();
+  }
+}
+  
+void MainDialog::unassignAttribute() {
+  if (currentAttribute != "") {
+    std::vector <std::vector <std::string> >::iterator sIt;
+    std::vector<std::string>::size_type eraseIndex = 0;
+    bool foundAttribute = false;
+    bool foundEvent = false;
+    std::vector <std::vector <std::string> >::size_type attributeIndex;
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedIncidentAttributes.size(); i++) {
+      std::vector<std::string> currentGroup = dataInterface->assignedIncidentAttributes[i];
+      if (currentGroup[0] == currentAttribute.toStdString()) {
+	foundAttribute = true;
+	attributeIndex = i;
+	for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
+	  std::istringstream ss(currentGroup[j]);
+	  std::vector <std::vector <std::string> >::size_type currentIndex;
+	  ss >> currentIndex;
+	  if (currentIndex == eventIndex) {
+	    foundEvent = true;
+	    eraseIndex = j;
+	  }
+	}
       }
     }
+    if (foundAttribute && foundEvent) {
+      dataInterface->assignedIncidentAttributes[attributeIndex].erase(dataInterface->assignedIncidentAttributes[attributeIndex].begin()
+								      + eraseIndex);
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "Unassigned attribute " + currentAttribute + " from incident " +
+	QString::number(eventIndex + 1);
+      logger->addToLog(newLog);
+      std::vector <std::vector <std::string> >::iterator it;
+      for (it = dataInterface->assignedIncidentAttributes.begin(); it != dataInterface->assignedIncidentAttributes.end();) {
+	std::vector<std::string> currentAssigned = *it;
+	if (currentAssigned.size() < 2) {
+	  dataInterface->assignedIncidentAttributes.erase(it);
+	}
+      }
+      for (it = dataInterface->incidentValues.begin(); it != dataInterface->incidentValues.end();) {
+	std::vector<std::string> currentValue = *it;
+	std::stringstream ss;
+	ss << eventIndex;
+	if (currentValue[0] == currentAttribute.toStdString() && currentValue[1] == ss.str()) {
+	  dataInterface->incidentValues.erase(it);
+	} else {
+	  it++;
+	}
+      }
+    }
+    disableAttributeSelection();
+    updateTexts();
   }
-  disableAttributeSelection();
-  updateTexts();
 }
 
 void MainDialog::setValue(const QString &newValue) {
@@ -1033,95 +1039,101 @@ void MainDialog::removeAttributes() {
 }
 
 void MainDialog::assignRelationship() {
-  std::vector <std::vector <std::string> >::iterator sIt;
-  bool foundRelationship = false;
-  bool foundEvent = false;
-  std::vector <std::vector <std::string> >::size_type relationshipIndex;
-  for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedRelationships.size(); i++) {
-    std::vector<std::string> currentGroup = dataInterface->assignedRelationships[i];
-    if (currentGroup[0] == currentRelationship.toStdString()) {
-      foundRelationship = true;
-      relationshipIndex = i;
-      std::vector<std::string>::iterator pIt;
-      for (pIt = currentGroup.begin() + 1; pIt != currentGroup.end(); pIt++) {
-	std::vector <std::vector <std::string> >::size_type currentIndex;
-	std::istringstream (*pIt) >> currentIndex;
-	if (currentIndex == eventIndex) {
-	  foundEvent = true;
+  if (currentRelationship != "") {
+    std::vector <std::vector <std::string> >::iterator sIt;
+    bool foundRelationship = false;
+    bool foundEvent = false;
+    std::vector <std::vector <std::string> >::size_type relationshipIndex;
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedRelationships.size(); i++) {
+      std::vector<std::string> currentGroup = dataInterface->assignedRelationships[i];
+      if (currentGroup[0] == currentRelationship.toStdString()) {
+	foundRelationship = true;
+	relationshipIndex = i;
+	std::vector<std::string>::iterator pIt;
+	for (pIt = currentGroup.begin() + 1; pIt != currentGroup.end(); pIt++) {
+	  std::vector <std::vector <std::string> >::size_type currentIndex;
+	  std::istringstream (*pIt) >> currentIndex;
+	  if (currentIndex == eventIndex) {
+	    foundEvent = true;
+	  }
 	}
       }
     }
+    if (!foundRelationship) {
+      std::vector <std::string> tempPair;
+      std::stringstream ss;
+      ss << eventIndex;
+      std::string newIndex = ss.str();
+      tempPair.push_back(currentRelationship.toStdString());
+      tempPair.push_back(newIndex);
+      dataInterface->assignedRelationships.push_back(tempPair);
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "Assigned relationship " + currentRelationship + " to incident " +
+	QString::number(eventIndex + 1) + ", while inspecting " + selectLeftEventComboBox->currentText() + " and " +
+	selectRightEventComboBox->currentText();;
+      logger->addToLog(newLog);
+    } else if (foundRelationship && !foundEvent) {
+      std::stringstream ss;
+      ss << eventIndex;
+      std::string newIndex = ss.str();
+      dataInterface->assignedRelationships[relationshipIndex].push_back(newIndex);
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "Assigned relationship " + currentRelationship + " to incident " +
+	QString::number(eventIndex + 1) + ", while inspecting " + selectLeftEventComboBox->currentText() + " and " +
+	selectRightEventComboBox->currentText();;
+      logger->addToLog(newLog);
+    }
+    disableAttributeSelection();
+    updateTexts();
   }
-  if (!foundRelationship) {
-    std::vector <std::string> tempPair;
-    std::stringstream ss;
-    ss << eventIndex;
-    std::string newIndex = ss.str();
-    tempPair.push_back(currentRelationship.toStdString());
-    tempPair.push_back(newIndex);
-    dataInterface->assignedRelationships.push_back(tempPair);
-    QDateTime time = QDateTime::currentDateTime();
-    QString timeText = time.toString(Qt::TextDate);
-    QString newLog = timeText + " - " + "Assigned relationship " + currentRelationship + " to incident " +
-      QString::number(eventIndex + 1);
-    logger->addToLog(newLog);
-  } else if (foundRelationship && !foundEvent) {
-    std::stringstream ss;
-    ss << eventIndex;
-    std::string newIndex = ss.str();
-    dataInterface->assignedRelationships[relationshipIndex].push_back(newIndex);
-    QDateTime time = QDateTime::currentDateTime();
-    QString timeText = time.toString(Qt::TextDate);
-    QString newLog = timeText + " - " + "Assigned relationship " + currentRelationship + " to incident " +
-      QString::number(eventIndex + 1);
-    logger->addToLog(newLog);
-  }
-  disableAttributeSelection();
-  updateTexts();
 }
 
 void MainDialog::unassignRelationship() {
-  std::vector <std::vector <std::string> >::iterator sIt;
-  std::vector<std::string>::size_type eraseIndex = 0;
-  bool foundRelationship = false;
-  bool foundEvent = false;
-  std::vector <std::vector <std::string> >::size_type relationshipIndex;
-  for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedRelationships.size(); i++) {
-    std::vector<std::string> currentGroup = dataInterface->assignedRelationships[i];
-    if (currentGroup[0] == currentRelationship.toStdString()) {
-      foundRelationship = true;
-      relationshipIndex = i;
-      for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
-	std::istringstream ss(currentGroup[j]);
-	std::vector <std::vector <std::string> >::size_type currentIndex;
-	ss >> currentIndex;
-	if (currentIndex == eventIndex) {
-	  foundEvent = true;
-	  eraseIndex = j;
+  if (currentRelationship != "") {
+    std::vector <std::vector <std::string> >::iterator sIt;
+    std::vector<std::string>::size_type eraseIndex = 0;
+    bool foundRelationship = false;
+    bool foundEvent = false;
+    std::vector <std::vector <std::string> >::size_type relationshipIndex;
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedRelationships.size(); i++) {
+      std::vector<std::string> currentGroup = dataInterface->assignedRelationships[i];
+      if (currentGroup[0] == currentRelationship.toStdString()) {
+	foundRelationship = true;
+	relationshipIndex = i;
+	for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
+	  std::istringstream ss(currentGroup[j]);
+	  std::vector <std::vector <std::string> >::size_type currentIndex;
+	  ss >> currentIndex;
+	  if (currentIndex == eventIndex) {
+	    foundEvent = true;
+	    eraseIndex = j;
+	  }
 	}
       }
     }
-  }
-  if (foundRelationship && foundEvent) {
-    dataInterface->assignedRelationships[relationshipIndex].erase(dataInterface->assignedRelationships[relationshipIndex].begin() +
-								  eraseIndex);
-    QDateTime time = QDateTime::currentDateTime();
-    QString timeText = time.toString(Qt::TextDate);
-    QString newLog = timeText + " - " + "Unassigned relationship " + currentRelationship + " from incident " +
-      QString::number(eventIndex + 1);
-    logger->addToLog(newLog);
-    std::vector <std::vector <std::string> >::iterator it;
-    for (it = dataInterface->assignedRelationships.begin(); it != dataInterface->assignedRelationships.end();) {
-      std::vector<std::string> currentAssigned = *it;
-      if (currentAssigned.size() < 2) {
-	dataInterface->assignedRelationships.erase(it);
-      } else {
-	it++;
+    if (foundRelationship && foundEvent) {
+      dataInterface->assignedRelationships[relationshipIndex].erase(dataInterface->assignedRelationships[relationshipIndex].begin() +
+								    eraseIndex);
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "Unassigned relationship " + currentRelationship + " from incident " +
+	QString::number(eventIndex + 1);
+      logger->addToLog(newLog);
+      std::vector <std::vector <std::string> >::iterator it;
+      for (it = dataInterface->assignedRelationships.begin(); it != dataInterface->assignedRelationships.end();) {
+	std::vector<std::string> currentAssigned = *it;
+	if (currentAssigned.size() < 2) {
+	  dataInterface->assignedRelationships.erase(it);
+	} else {
+	  it++;
+	}
       }
     }
+    disableAttributeSelection();
+    updateTexts();
   }
-  disableAttributeSelection();
-  updateTexts();
 }
 
 void MainDialog::addRelationship() {

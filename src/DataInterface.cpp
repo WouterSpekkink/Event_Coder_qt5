@@ -710,7 +710,6 @@ void DataInterface::readSave(const QString &fileName) {
   header.clear();
   rowData.clear();
   memos.clear();
-  eventFlagIndex.clear();
   relationMemos.clear();
 
   incidentAttributes.clear();
@@ -727,6 +726,11 @@ void DataInterface::readSave(const QString &fileName) {
   entityAttributeCategories.clear();
   assignedEntityAttributeCategories.clear();
   relationshipTypes.clear();
+
+  std::vector<bool>::iterator efIt;
+  for (efIt = eventFlagIndex.begin(); efIt != eventFlagIndex.end(); efIt++) {
+    *efIt = false;
+  }
   
   // Then we make some strings that we need to store data temporarily.
   std::string eventIndex;
@@ -1237,7 +1241,7 @@ void DataInterface::importCodes(const QString &fileName) {
   std::vector<std::string> tempHeader;
   std::vector <std::vector <std::string> > tempRowData;
   memos.clear();
-  eventFlagIndex.clear(); // We also clear this one, because the indexes are no longer right.
+
   relationMemos.clear();
   incidentAttributes.clear();
   assignedIncidentAttributes.clear();
@@ -1253,6 +1257,11 @@ void DataInterface::importCodes(const QString &fileName) {
   entityAttributeCategories.clear();
   assignedEntityAttributeCategories.clear();
   relationshipTypes.clear();
+
+  std::vector<bool>::iterator efIt;
+  for (efIt = eventFlagIndex.begin(); efIt != eventFlagIndex.end(); efIt++) {
+    *efIt = false;
+  }
   
   // Then we make some strings that we need to store data temporarily.
   std::string eventIndex;
@@ -1281,7 +1290,7 @@ void DataInterface::importCodes(const QString &fileName) {
  
   // Then we read all the lines of data in the input file.
   while(myFile) {
-    The buffer will hold one line of raw data temporarily, and we will do some processing on it.
+    //The buffer will hold one line of raw data temporarily, and we will do some processing on it.
     std::string buffer;
    
     if (!getline(myFile, buffer)) break;
@@ -2043,9 +2052,9 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  }
 	}
 	if (attIt != assignedIncidentAttributes.end() - 1) {
-	  matrixOut << value << ",";
+	  matrixOut << "\"" << value << "\"" << ",";
 	} else {
-	  matrixOut << value << "\n";
+	  matrixOut << "\"" << value << "\"" << "\n";
 	} 
       }
     }
@@ -2126,7 +2135,8 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  currentMemo = currentRelMemo[1];
 	}
       }
-      relIndNodesOut  << currentAssigned[0] << "," << currentAssigned[0] << "," << currentMemo << "," << "Relationship" << "\n";
+      relIndNodesOut  << currentAssigned[0] << "," << currentAssigned[0] << "," << "\""
+		      << currentMemo << "\"" << "," << "Relationship" << "\n";
       std::vector<std::string>::iterator arIt;
       for (arIt = currentAssigned.begin() + 1; arIt != currentAssigned.end(); arIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
@@ -2223,7 +2233,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  attDesc = currentAtt[1];
 	}
       }
-      eaNodesOut << currentAttribute[0] << "," << currentAttribute[0] << "," << attDesc << "," << "Attribute" << "\n";
+      eaNodesOut << currentAttribute[0] << "," << currentAttribute[0] << "," << "\"" << attDesc << "\"" << "," << "Attribute" << "\n";
       std::vector<std::string>::iterator aIt3;
       for (aIt3 = currentAttribute.begin() + 1; aIt3 != currentAttribute.end(); aIt3++) {
 	eaEdgesOut << currentAttribute[0] << "," << *aIt3 << "," << "Directed" << "," << "IS_ATTRIBUTE_OF" << "\n";
@@ -2275,9 +2285,9 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 		  }
 		}
 		if (attIt != assignedEntityAttributes.end() - 1) {
-		  matrixOut << value << ",";
+		  matrixOut << "\"" << value << "\"" << ",";
 		} else {
-		  matrixOut << value << "\n";
+		  matrixOut << "\"" << value << "\"" << "\n";
 		} 
 	      }
 	    }
@@ -2316,7 +2326,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       for (ecIt3 = currentCategory.begin() + 1; ecIt3 != currentCategory.end(); ecIt3++) {
 	ecEdgesOut << *ecIt3 << "," << currentCategory[0] << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
       }
-      ecNodesOut << currentCategory[0] << "," << currentCategory[0] << "," << catDesc << "," << "Category" << "\n";
+      ecNodesOut << currentCategory[0] << "," << currentCategory[0] << "," << "\"" << catDesc << "\"" << "," << "Category" << "\n";
     }
     ecNodesOut.close();
     ecEdgesOut.close();

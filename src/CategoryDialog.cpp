@@ -299,5 +299,13 @@ bool CategoryDialog::eventFilter(QObject *target, QEvent *event) {
       }
     }
   }
+    if (target == nameField) {
+    if (event->type() == QEvent::KeyPress) {
+      QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+      if (keyEvent->key() == Qt::Key_Comma) {
+	return true;
+      }
+    }
+  }
   return QObject::eventFilter(target, event);
 }

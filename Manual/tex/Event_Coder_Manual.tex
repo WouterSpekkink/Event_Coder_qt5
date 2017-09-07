@@ -29,6 +29,28 @@
 
 \begin{document}
 
+\begin{titlingpage}
+  
+  \centering
+  \vspace{0.5 cm} 
+  \vbox{\hrule width \hsize \kern 1mm \hrule width \hsize height 2pt}
+  \vspace{0.4cm}
+  \textsc{\LARGE The Event Coder program User Manual} \\[2.0 cm]
+% \vspace{0.4 cm}
+ %\rule{\linewidth}{0.4 mm} \\
+ %\vspace{1.0 cm}
+ \vfill 
+ \begin{minipage}{0.4\textwidth}
+   \begin{center}
+     \emph{Wouter Spekkink}
+   \end{center}
+   \begin{center} \large
+     \textsc{\today} \\[10.0 cm]
+   \end{center}
+ \end{minipage}~
+\end{titlingpage}
+
+
 \chapter{Introduction}
 \label{chap:introduction}
 
@@ -37,7 +59,7 @@
 
 The document you are currently reading is the user manual for the open source (GPL 3.0) software tool called \emph{\textbf{Event Coder}}, written by me (Wouter Spekkink) in C++ and Qt5 \footnote{The source code is available from my Github page (see chapter \ref{chap:contactdetails}).}.
 
-The program is intended to facilitate in the qualitative coding of event data. In this case, event data refers specifically to bracketed, chronologically ordered, qualitative data that captures actions and/or interactions that occurred in some type of process. My thinking about what event data is, and much of the terminology that I use, is heavily inspired by activities carried out as part of the Minnesota Innovation Research Program\footnote{see especially Poole, M. S., Van De Ven, A. H., Dooley, K., \& Holmes, M. E. (2000). \emph{Organizational Change and Innovation Processes: Theory and Methods for Research.} Oxford: Oxford University Press.}. I have many other sources of inspiration that I will not mention in this manual. It should be easy enough to find my other sources of inspirations in the publications I have written (see my contact details in chapter \ref{chap:contactdetails}).
+The program is intended to facilitate in the qualitative coding of event data. In this case, event data refers specifically to bracketed, chronologically ordered, qualitative data that captures actions and/or interactions that occurred in some type of process. My thinking about what event data is, and much of the terminology that I use, is heavily inspired by activities carried out as part of the Minnesota Innovation Research Program\footnote{see especially Poole, M. S., Van De Ven, A. H., Dooley, K., \& Holmes, M. E. (2000). \emph{Organizational Change and Innovation Processes: Theory and Methods for Research.} Oxford: Oxford University Press. I was not involved in this work in any way.}. I have many other sources of inspiration that I will not mention in this manual. It should be easy enough to find my other sources of inspirations in the publications I have written (see my contact details in chapter \ref{chap:contactdetails}).
 
 Why is it useful to have this tool? Over the past years I have worked together with other people (especially Frank Boons) to develop and use various methods and tools for the study of social processes. In doing so, we have always worked with the principle that our fundamental units of analysis should be events, that is, things that ``happened'' or ``came to pass'', as opposed to, for example, variables. Based on ideas shared by the researchers from the Minnesota Innovation Research Program, we started collecting data in the form of \emph{incidents}, which are qualitative, bracketed descriptions of actions or interactions, which consist (at least) of (1) an indication of the time at which the action or interaction occurred, (2) a (brief) qualitative description of the action or interaction, and (3) the source of data (e.g., a document, an interview, personal conversation)\footnote{The descriptions (point 2) are typically created by the researcher him/herself. When I am using textual sources (e.g., documents, web pages, interview transcripts), I also like to add the ``raw'' text on which my incident description was based.}. During the collection of event data, we create numerous incidents, which we store in chronologically ordered event data sets.
 
@@ -70,14 +92,60 @@ I also do \textbf{not} have a team of beta-testers to help me test the program. 
 \chapter{Preparations}
 \label{chap:preparations}
 
+\section{It is all about the data}
+\label{sec:allaboutdata}
+
+
+As mentioned in section \ref{sec:partofbiggerprogram}, the \textbf{\emph{Event Coder}} program is designed to be eventually integrated into a larger program. In that larger program, data would be entered into, and managed by the program directly. For now, however, the \textbf{\emph{Event Coder}} program needs to import all data from external sources, that is, files created by the user before using the program. The program can be understood to make some assumptions about the nature of these files, and if these assumptions are not met while reading files the program may not work as it should.
+
+Fortunately, creating files that can be read by the program is not difficult. Moreover, the ways these files should be created follow logically from the kind of research approach that this program is designed to fit into. In this chapter, I go into all things that the user should think of well before using this program, preferably in the stage before data collection. Most of these details have to do with the kind of data sets that the program ``expects'' you to work with.
+
 \section{Data sets}
 \label{sec:datasets}
 
+The program expects that you will import data from what I will call an \emph{event data set}, which is nothing more then a table of chronologically ordered \emph{incidents}. The idea of having such data sets, and the concept of incidents are both based on ideas developed during the Minnesota Innovation Research Program\footnote{see especially Poole, M. S., Van De Ven, A. H., Dooley, K., \& Holmes, M. E. (2000). \emph{Organizational Change and Innovation Processes: Theory and Methods for Research.} Oxford: Oxford University Press. I was not involved in this work in any way.}. An incident is a bracketed, qualitative description of an observed action or interaction, which includes, at least, the following information:
+\begin{enumerate}
+\item{An indication of the time at which the incident occurred.}
+\item{A brief (qualitative) description of the action or interaction, including a description of the actors/entities responsible for the action.}
+\item{A reference to the source of data.}
+\end{enumerate}
+
+This is still a very open description of what an incident actually can contain. As a social scientists, I am typically mostly interested in \emph{human activity}, that is, in actions and interactions performed by human beings. That, in itself, is still a very broad category, and it leaves open the question at what level of abstraction an given action can and/or should be described\footnote{One of the my other sources of inspiration is the work of Peter Abell on Comparative Narratives. Abell's work engages more or less directly with questions of how to describe activity at different levels of abstraction. See especially: Abell, P. (1987). \emph{The syntax of social life: the theory and method of comparative narratives}. Oxford, Angleterre: Clarendon.}. We may also understand the concept of action in a much broader sense, such that we also include natural occurrences, such as volcanic eruptions, an apple that falls from a tree, or the wind that blows. In the end, what makes sense to count as an action will depend on your research questions, your theoretical orientation, and probably on who you count among your favourite philosophers.
+
+Fortunately, the \emph{\textbf{Event Coder}} program does not care about your definition of an action. However, whatever definition you decide to work with, the program does care about how exactly you store information on that action as incidents in your data sets. In the type of event data sets that we work with here, the very first row of data is always the \textbf{header} of the file, which contains the names of the columns in the data file (see figure \ref{fig:datasetstructure}). All the remaining rows of the data set represent individual incidents. The three aspects of incidents that we mentioned above (timing, description and source) should be stored in separate columns. You may label and position these columns however you like, but we expect these columns to be there.
+
+\begin{figure}[h!]
+  \centering
+  \caption{The expected structure of event data sets.}
+  \includegraphics[width=100mm]{Diagram_4.pdf}
+  \label{fig:datasetstructure}
+\end{figure}
+
+You may also add additional columns to your data set, to expand on the information about incidents that the data set records. For example, I made a habit of also including fragments of text from my original sources from which I derived my incident descriptions. In my opinion, this makes the process of coding incidents both easier, and more transparent.    
+
+Another important assumption that the \textbf{\emph{Event Coder}} program makes about your data set is that it is chronologically ordered. That means that the incident reported in a given row is assumed to have happened after the incident preceding it (of course, with the exception of the first incident in the data set). Even if two or more incidents actually happened simultaneously, based on their position in the data set, the program will always assume that there is an order in their occurrence. In practice, this should not be a serious problem.
+
+These are basically all the assumptions that the program makes about the overall structure of the file. However, there are some other practical considerations to be taken into account. The most important one is that the \textbf{\emph{Event Coder}} program can only import so-called \emph{comma-delimited files} (I will refer to them as csv files), which can be recognised by their ``*.csv'' extension (e.g., ``My\textunderscore Dataset.csv''). These files are very much like plain text files (``*.txt''), but they use so-called \emph{delimiters} (most often commas or semicolons) to distinguish between different columns. You can open csv files in a basic text editor to see what this looks like (see figure \ref{fig:csvfile}).
+
+\begin{figure}[h!]
+  \centering
+  \caption{What a csv file looks like in a basic text editor.}
+  \includegraphics[width=80mm]{Screenshot_19.pdf}
+  \label{fig:csvfile}
+\end{figure}
+
+Spreadsheet software, like Excel or LibreOffice Calc, typically allows you to store tables as csv files, using the \textbf{``Save As''} option\footnote{I have encountered a few people who misunderstood how this works, and who simply tried to convert files by changing their extension. For example, they would rename a file called ``My\textunderscore Dataset.xls'' to ``My\textunderscore Dataset.csv''. This will not work, because it will not actually change the file itself. It is more likely that you will just render your file unreadable for most software, because the software will think it is reading a csv file, while it is really reading an xls file that is only disguised as a csv file.}. Some software, like Excel, will use a delimiter that is set ``system-wide''. If you are unsure what delimiter your system uses, just open your csv file with a text editor, and see what characters are used to separate columns. You will need to know what delimiter your files use to be able to import them properly. Other software, like LibreOffice Calc, allows you to choose what delimiter to use when you save the csv file.
+
+So, you can create your data set using in any spreadsheet software that you prefer. You can also store your data set in any format that you prefer while building it. The important thing is that you should be able to store it as a simple csv file as soon as your are ready to import it into the \textbf{\emph{Event Coder}} program. For example, while working on my data sets, I typically store my data in ods files or xls files, but as soon as I want to start coding my data, I will use the \textbf{``Save as''} feature of whatever program I am working with to store a csv file.   
 
 \subsection{Other notes}
 \label{sec:othernotesdatasets}
 
-The program is not able to read csv-files that have so-called newline symbols (\textbackslash n) or carriage return symbols (\textbackslash r) in their text cells. The reason for this is that the program uses a relatively simple csv-file parser, which will think that a new line of data will start after encountering one of these symbols (each line of data in a csv-file will end with a newline symbol by default). The program is typically able to recognise when an 'illegal' newline is encountered, and it will throw an error (see figure \ref{fig:importerror}). Solving the error is left to the user. The problem can be solved by removing all newline symbols and carriage return symbols from the csv-file with the dataset. These symbols are not visible in programs like Excel or LibreOffice Calc, and in both programs you will need to use special search and replace options to get rid of the unwanted symbols. I advise you to Google for ``Find and replace regular expressions with [your spreadsheet program]''. 
+There is a little bit more going on in csv files than what is shown in a regular text editor. What figure \ref{fig:csvfile} does not show, for example, is that there are also hidden characters present in the file that tell the computer where each line of data ends (so-called newline symbols: \textbackslash n). You usually do not have to worry about the presence of such characters, with some small exceptions. 
+
+The \emph{\textbf{Event Coder}} program is not able to read csv files that have so-called newline symbols (\textbackslash n) or carriage return symbols (\textbackslash r) \emph{within} their text cells. The reason for this is that the program uses a relatively simple csv file parser, which will think that a new line of data will start after encountering one of these symbols (each line of data in a csv file will end with a newline symbol by default). Fortunately, inserting such symbols into the text cells will only happen if you deliberately create them, or accidentally paste them into your file. 
+
+The program is typically able to recognise when an 'illegal' newline is encountered, and it will throw an error (see figure \ref{fig:importerror}). Solving the error is left to the user. The problem can be solved by removing all newline symbols and carriage return symbols from the csv file. These symbols are not visible in programs like Excel or LibreOffice Calc, and in both programs you will need to use special search and replace options to get rid of the unwanted symbols. I advise you to Google for ``Find and replace regular expressions with [your spreadsheet program]''. 
 
 \chapter{Using the program: Basic features}
 \label{chap:usingtheprogram}
@@ -85,9 +153,9 @@ The program is not able to read csv-files that have so-called newline symbols (\
 \section{Loading a new dataset}
 \label{sec:loadingnewdataset}
 
-Importing the new data into the program works as follows. You first need to select the csv-file containing your data. For this you will click the \textbf{Select File} button (see figure \ref{fig:importoptions}), which will open a file dialog that you can use to navigate to, and select the file.
+Importing the new data into the program works as follows. You first need to select the csv file containing your data. For this you will click the \textbf{Select File} button (see figure \ref{fig:importoptions}), which will open a file dialog that you can use to navigate to, and select the file.
 
-Once a file has been selected, you will need to select the delimiter symbol that is used in the csv-file to distinguish between different columns of the data table. For this, you can use the dropdown menu that reads \textbf{-Select delimiter-} by default. Four different symbols are allowed as delimiter, which are the comma (,), the semicolon (;), the colon (:), and the vertical bar (\textbar). Make sure that the delimiter that you select matches the one used in the file.
+Once a file has been selected, you will need to select the delimiter symbol that is used in the csv file to distinguish between different columns of the data table. For this, you can use the dropdown menu that reads \textbf{-Select delimiter-} by default. Four different symbols are allowed as delimiter, which are the comma (,), the semicolon (;), the colon (:), and the vertical bar (\textbar). Make sure that the delimiter that you select matches the one used in the file.
 
 Once you have selected a delimiter, you can import the data, using the \textbf{Import data} button. Once you click this button, the program will attempt to read data from selected file and, if successful, enable all other options of the program, allowing you to start coding.   
 
@@ -101,9 +169,9 @@ Once you have selected a delimiter, you can import the data, using the \textbf{I
 \subsection{Problems when importing data}
 \label{sec:importerrors}
 
-If you (1) selected a valid csv-file, (2) selected the correct delimiter for this file, and (3) structured your data set using instructions offered in section \ref{sec:datasets}, you should encounter no problems when importing the data. If something goes wrong when importing data, then the problem will usually lie with one of these three points.
+If you (1) selected a valid csv file, (2) selected the correct delimiter for this file, and (3) structured your data set using instructions offered in section \ref{sec:datasets}, you should encounter no problems when importing the data. If something goes wrong when importing data, then the problem will usually lie with one of these three points.
 
-One possibility is that you have not selected a valid csv-file. I have encountered a few people that have tried to create csv-files from (for example) xls-files by simply changing the file extension. Doing this will not actually create a valid csv-file that can be read by the program. The correct way for creating csv-files is to use the \textbf{Save as} option in your spreadsheet editor, and select to save the file with the \textbf{*.csv} extension.
+One possibility is that you have not selected a valid csv file. I have encountered a few people that have tried to create csv files from (for example) xls-files by simply changing the file extension. Doing this will not actually create a valid csv file that can be read by the program. The correct way for creating csv files is to use the \textbf{Save as} option in your spreadsheet editor, and select to save the file with the \textbf{*.csv} extension.
 
 If you selected the wrong delimiter, the program will usually import the data, but it will fail to distinguish between different columns of the data set, and possibly assume that the entire dataset only contains one column. This should be obvious from the texts displayed by the program. In this case, simply import the data again, using the correct delimiter. 
 
@@ -233,6 +301,20 @@ If you later want to return to your flagged incident, you can use the \textbf{Pr
 
 In any coding process it usually helps to write down your thoughts while coding, so that other people can, for example, read your motivations for assigning certain codes to a certain incident. Moreover, when coding larger data sets, you will often forget yourself why you made certain coding decisions. Typically, you would write down any relevant thoughts in the form of memos. The program allows you to associate memos with particular incidents. The memo associated with the current incident can be accessed by clicking the \textbf{Add / Edit memo} button. Clicking this button will open a small dialog, which consists out of a text field, where you can write your memo, and one button that allows you to save and close the memo dialog. If you want to add a memo, or edit an existing one, simply write the text you want to add, and then click the \textbf{Save and close} button. If you want to remove a memo you wrote earlier, simply delete all the text in that memo, and click the \textbf{Save and close} button. Each incident will have its own memo.
 
+\section{Filtering}
+\label{sec:filtering}
+
+In various dialogs of the program, you will find \textbf{filter fields}. As you are using the program, and you are enthusiastically adding new attributes, categories, entities, relationships, and so on, it will soon become a nuisance to find your way through all the objects you have created. That is why I created the \textbf{filter fields}.
+
+\textbf{Filter fields} work very simple. As soon as you type letters in such a field, the program will filter out objects from the corresponding lists that do not contain that letter in their label. If you add more letters to the filter, creating a string, then the program will filter out all objects that do not contain that string in their label. For an example of a filter field in action, see figure \ref{fig:filteringattributes}. The filters are case sensitive (i.e., 'e' and 'E' are treated as two different cases). 
+
+\begin{figure}[h!]
+  \centering
+  \caption{Filtering attributes.}
+  \includegraphics[width=80mm]{Screenshot_10.pdf}
+  \label{fig:filteringattributes}
+\end{figure}
+
 \section{Exporting data}
 \label{sec:exportingdata}
 
@@ -260,6 +342,7 @@ Thus, in total, up to 16 files will thus be exported. These files will all be au
 
 To understand more about what you could possibly do with all these files, please read chapter \ref{chap:whatisnext}.
 
+
 \section{Log files and exiting the program}
 \label{sec:logfilesandexiting}
 
@@ -276,7 +359,9 @@ The logs are designed to help you make the coding process more transparent. For 
 \section{Introduction to coding}
 \label{sec:introductiontocoding}
 
-Now we get to the core ``stuff'' of what the \textbf{\emph{Event Coder}} program is all about: Coding the data. In this program the coding options are divided into two main modules, \textbf{Attributes} and \textbf{Relationships}, which can be used in various ways, and which do not necessarily have to be used together. In this chapter, I will explain both coding modules in depth, and offer some basic suggestions for how they could be used.
+Now we get to the core ``stuff'' of what the \textbf{\emph{Event Coder}} program is all about: Coding the data. In some ways, coding data in this program is similar to what you would do using software packages such as NVivo, Atlas.ti, or MaxQDA. Say, for example, that you would code an interview transcript in Atlas.ti. What you would typically do, is to select a fragment of text in the interview transcript, and then assign a label to this fragment. In the \textbf{\emph{Event Coder}} tool we do more or less the same thing, but our fragments of text have already been identified beforehand, in the form of incidents. Another way of looking at this is that creating your event data set (especially its incident descriptions), is already an important part of the coding process\footnote{And I believe this is a good way of looking at it, because the difficulties you face while deciding where an incident starts and where it ends, and what is a relevant incident in the first place, are quite similar to the difficulties you face while trying to identify the relevant fragments of text in an interview transcript.}. 
+
+In the \textbf{\emph{Event Coder}} program the coding options are divided into two main modules, \textbf{Attributes} and \textbf{Relationships}, which can be used in various ways, and which do not necessarily have to be used together. In this chapter, I will explain both coding modules in depth, and offer some basic suggestions for how they could be used.
 
 \section{The Attribute module}
 \label{sec:attributemodule}
@@ -284,7 +369,7 @@ Now we get to the core ``stuff'' of what the \textbf{\emph{Event Coder}} program
 We will first focus on the module that can be used to associate attributes with incidents. I decided to use the term attributes in this case, because these entities will generally be used to identify relevant properties of the incidents. Some example of different sorts of attributes that I thought of myself, are as follows:
 \begin{itemize}
 \item{\emph{\textbf{(Inter)action types}}: Given that incidents are assumed to capture (inter)actions (see section \ref{sec:datasets}), one thing we possibly want to do is to use attributes to identify different types of action. For example, imagine that we have a data set that captures interactions between cats and dogs. Examples of attributes that capture different types of such (inter)actions are \emph{barking}, \emph{meowing}, \emph{chasing cats}, \emph{hissing at dogs}, and so on. We would have a list of such attributes, each describing an individual type of (inter)action, and assign these to incidents where appropriate. The point here is to treat each individual incident is the occurrence of a particular type of (inter)action (see figure \ref{fig:usesofattributes}.A).}
-\item{\emph{\textbf{Colligated events}}: On some occasions, the researcher using the program might not necessarily be interested in the (inter)actions described by his/her incidents per se, and he/she might instead be more interested in some more abstract event for which the incidents serve as indicators. For example, imagine someone who made a data set that records the interactions between two primitive clans that inhabit roughly the same geographical area. The incidents could in this case be empirical descriptions of the interactions that involve members from both clans. Some of these interactions may refer to occasions where members of the clans exchanged certain objects or services, which one might see as indicative of \emph{trading} between the clans. Other interactions may refer to occasions where members of the clans attack each other, which one might see as indicative of \emph{conflict} between the clans. One could of course assign such interaction types as attributes (see above), but one would thereby overlook that some of the exchanges (described by more than one incident) and some of the attacks (described by more than one incident) refer to the same instances of \emph{trading} or \emph{conflict}. The point here is thus to use attributes to indicate which incidents ``group'' together. We could, for example, distinguish between different instances of trading by numbering them (see figure \ref{fig:usesofattributes}.B). If desirable, we could even make explicit that the different versions of the same attribute (e.g., \emph{Trading\textunderscore 1} and \emph{Trading\textunderscore 2}) belong together by assigning a category called \emph{Trading} to them. Attribute categories are explained further on in this section.}
+\item{\emph{\textbf{Colligated events}}: On some occasions, the researcher using the program might not necessarily be interested in the (inter)actions described by his/her incidents per se, and he/she might instead be more interested in some more abstract event for which the incidents serve as indicators. For example, imagine someone who made a data set that records the interactions between two primitive clans that inhabit roughly the same geographical area. The incidents could in this case be empirical descriptions of the interactions that involve members from both clans. Some of these interactions may refer to occasions where members of the clans exchanged certain objects or services, which one might see as indicative of \emph{trading} between the clans. Other interactions may refer to occasions where members of the clans attack each other, which one might see as indicative of \emph{conflict} between the clans. One could of course assign such interaction types as attributes (see above), but one would thereby overlook that some of the exchanges (described by more than one incident) and some of the attacks (described by more than one incident) refer to the same instances of \emph{trading} or \emph{conflict}. The point here is thus to use attributes to indicate which incidents ``group'' together. We could, for example, distinguish between different instances of trading by numbering them (see figure \ref{fig:usesofattributes}.B). If desirable, we could even make explicit that the different versions of the same attribute (e.g., \emph{Trading\textunderscore 1} and \emph{Trading\textunderscore 2}) belong together by assigning a category called \emph{Trading} to them (see section \ref{sec:incidentattributecategories}).}
 \item{\emph{\textbf{Value changes}}: There are approaches to studying social processes that treat each incident inherently as a change. In some cases, one could even want to use values to express by how much something changes. Imagine that you check how much money you currently have on your bank account, and you find (to your surprise) that you are in debt. In a flurry of irrational behaviour, you decide to reconstruct all your incomes and expenses in an event data set, to reconstruct how you got to this point (Maybe it works therapeutic? Who knows?). To capture your incomes and expenses, you could simply create two attributes: \emph{Money increase} and \emph{Money decrease}, and assign these to incidents in your data set accordingly. As will be explained further on in this section, you have the possibility to assign a value to any attribute that is also assigned to an incident. This value will always be unique to that particular ``incident-attribute pair''. This allows you to track, over time, how much money went in or out (although values do not necessarily have to be numerical), and by how much (see figure \ref{fig:usesofattributes}.B).}
 \end{itemize}
 
@@ -337,17 +422,6 @@ After creating an attribute, you will return to the main dialog, and the new att
   \label{fig:attributepool}
 \end{figure}
 
-\subsection{Filtering attributes}
-\label{sec:filteringattributes}
-
-As you are enthusiastically creating new attributes, the \textbf{Attribute pool} will quickly start to fill up, and finding the right attributes to assign to incidents will become a nuisance. That is why I also implemented a filtering option. Filtering works very simple. As soon as you type letters in the dialog, the program will filter out attributes from both the list of \textbf{Incident attributes} and the \textbf{Attribute pool} that do not contain that letter. If you add more letters to the filter, creating a string, then the program will filter out all attributes that do not contain that string (see figure \ref{fig:filteringattributes}). The filter is case sensitive (i.e., 'e' and 'E' are treated as two different cases). 
-
-\begin{figure}[h!]
-  \centering
-  \caption{Filtering attributes.}
-  \includegraphics[width=80mm]{Screenshot_10.pdf}
-  \label{fig:filteringattributes}
-\end{figure}
 
 \subsection{Editing attributes}
 \label{sec:editingattributes}
@@ -400,7 +474,7 @@ Export the data that you have coded so far (see section \ref{sec:exportingdata})
 \subsection{Assigning and unassigning attributes}
 \label{sec:assigningunassigningattributes}
 
-Once you have created attributes, you can start assigning them to incidents. Assigning an attribute to an incident can be done by selecting the attribute in the \textbf{Attribute pool}, and then clicking the assign button (\textbf{\guillemotleft}). The attribute will move from the \textbf{Attribute pool} to the list of \textbf{Incident attributes}, and the attribute is now associated with this incident. In figure \ref{fig:assignedattributes} we have assigned one attributes to the current incident, based on the description of the incident available to us.
+Once you have created attributes, you can start assigning them to incidents. Assigning an attribute to an incident can be done by selecting the attribute in the \textbf{Attribute pool}, and then clicking the assign button (\textbf{\guillemotleft}). The attribute will move from the \textbf{Attribute pool} to the list of \textbf{Incident attributes}, and the attribute is now associated with this incident. In figure \ref{fig:assignedattributes} we have assigned one attribute to the current incident, based on the description of the incident to us.
 
 \begin{figure}[h!]
   \centering
@@ -412,6 +486,8 @@ Once you have created attributes, you can start assigning them to incidents. Ass
 In this case, we have also done something else: we have added a value to the attribute, by clicking on the assigned variable, and then typing ``5 cats'' in the value field, which is located above the list of \textbf{Incident attributes}, to indicate that the dog is chasing 5 cats in total.
 
 If we decide that this value is not important after all, we could just select the attribute again, and delete the value that we entered.
+
+Unassigning attributes is achieved by clicking the attribute in the list of \textbf{Incident attributes}, and clicking the unassign button (\textbf{\guillemotright}). The attribute will move from the list of \textbf{Incident attributes} to the \textbf{Attribute pool}, and the attribute will no longer be associated with the current incident. Also, if a value was assigned to the attribute, this value will now have been removed. \textbf{This action is irreversible}. 
 
 And with this we have covered everything important that there is to know about the attribute module of the program!
 
@@ -454,13 +530,13 @@ A new entity can be create by clicking the \textbf{Define new entity} button. Th
   \label{fig:entitydialog}
 \end{figure}
 
-Similar to attributes, entities always require (1) a \emph{unique} name, and (2) a description. The name will be used throughout the program to refer to the entity. Optionally, you can also assign attributes to entities. \textbf{Assigning attributes to entities works the exact same as assigning attributes to incidents. I therefore do not explain this procedure here, but refer you to section \ref{sec:attributemodule}}. The program does, of course, make a distinction between attributes (and their categories) associated with incidents, and attributes (and their categories) associated with entities. 
+Similar to attributes, entities always require (1) a \emph{unique} name, and (2) a description. The name will be used throughout the program to refer to the entity. The description should be used to offer a more detailed description of what or who this entity is. Optionally, you can also assign attributes to entities. \textbf{Assigning attributes to entities works the exact same as assigning attributes to incidents. I therefore do not explain this procedure here, but refer you to section \ref{sec:attributemodule}}. The program does, of course, make a distinction between attributes (and their categories) associated with incidents, and attributes (and their categories) associated with entities, but they are created, edited, removed, assigned and unassigned in the exact same way.  
 
 Once you have created a new entity, it will appear in the \textbf{source node} selection field, and the \textbf{target node} selection field (see figure \ref{fig:relationshipdialog2}).
 
-As with the attributes and categories, editing entities in these lists can be done by selecting them, and clicking the \textbf{Edit highlighted entity} button. This will open an entity dialog with the corresponding information already included. 
+As with the attributes and categories, editing entities in these lists can be done by selecting them, and clicking the \textbf{Edit highlighted entity} button (also see section \ref{sec:editingrelationships}). This will open an entity dialog with the corresponding information already included. 
 
-As with attributes and categories, it is only possible to remove entities that are not currently in use, which in this case means that you can only remove entities that are not participating in one of the relationships that have been defined (whether that relationship itself has been used or not).
+As with attributes and categories, it is only possible to remove entities that are not currently in use, which in this case means that you can only remove entities that are not participating in one of the relationships that you have already defined (whether that relationship itself has been assigned to an incident or not).
 
 To remove unused entities, click the \textbf{Remove unused entities} button. Before doing this, you might first want to remove unused relationships (see section \ref{sec:removingrelationships}). This should also free up any entities that were assigned to unused relationships.
 
@@ -476,18 +552,20 @@ To create a new relationship type, click the \textbf{Define new relationship typ
   \label{fig:relationshiptypedialog}
 \end{figure}
 
-As with attributes, entities and categories, new relationship types can only be saved if you have assigned both a label and a description to them. In the case of relationship types you also need to indicate the direction of the relationship, which is set to \textbf{Directed} by default. In a direction relationship, the relationship is always directed from the \textbf{source node} to the \textbf{target node} (e.g., \(source-[likes]\rightarrow target\)). In an \textbf{undirected} relationship, there is no direction, and the \textbf{source node} and the \textbf{target node} are interchangeable (e.g., \(source-[talks with]\rightarrow target\)). 
+As with attributes, entities and categories, new relationship types can only be saved if you have assigned both a label and a description to them. The label is used to refer to the relationship types throughout the program, and the description should be used to offer a clear definition of the relationship type. In the case of relationship types you also need to indicate the direction of the relationship, which is set to \textbf{Directed} by default. In a direction relationship, the relationship is always directed from the \textbf{source node} to the \textbf{target node} (e.g., \(source-[likes]\rightarrow target\)). In an \textbf{undirected} relationship, there is no direction, and the \textbf{source node} and the \textbf{target node} are interchangeable (e.g., \(source\leftarrow [talks\ with]\rightarrow target\))\footnote{For this reason, the program will treat two undirected relationships as identical even if they mirror each other. For example, the program will think that \(A\leftarrow [talks\ with]\rightarrow B\) is identical to \(B\leftarrow [talks\ with]\rightarrow A\).}. 
 
 Once you have created a new relationship type, it will appear in the \textbf{Relationship type} selection field (see figure \ref{fig:relationshipdialog2}).
 
-As with the attributes, categories, and entities, editing relationship types in these lists can be done by selecting them, and clicking the \textbf{Edit highlighted relationship type} button. This will open a relationship type dialog with the corresponding information already included. 
+As with the attributes, categories, and entities, editing relationship types in these lists can be done by selecting them, and clicking the \textbf{Edit highlighted relationship type} button (also see section \ref{sec:editingrelationships}). This will open a relationship type dialog with the corresponding information already included. 
 
-As with attributes, categories an entities, it is only possible to remove relationship types that are not currently in use, which in this case means that you can only remove relationship types that are not participating in one of the relationships that have been defined (whether that relationship itself has been used or not).
+As with attributes, categories an entities, it is only possible to remove relationship types that are not currently in use, which in this case means that you can only remove relationship types that are not participating in one of the relationships that you have defined earlier (whether that relationship itself has assigned to an incident or not).
 
 To remove unused relationship types, click the \textbf{Remove unused relationship types} button. Before doing this, you might first want to remove unused relationships (see section \ref{sec:removingrelationships}). This should also free up any relationship types that were assigned to unused relationships.
 
 \subsection{Creating new relationships - part 2}
 \label{sec:creatingnewrelationships2}
+
+Now that we have created a few entities and relationship types (see figure \ref{fig:relationshipdialog2}), we have the basic ingredients required to define a relationship.
 
 \begin{figure}[h!]
   \centering
@@ -496,23 +574,140 @@ To remove unused relationship types, click the \textbf{Remove unused relationshi
   \label{fig:relationshipdialog2}
 \end{figure}
 
+To create a relationship, we need to select (1) a \textbf{source node}, (2) a \textbf{relationship type}, and (3) a \textbf{target node}. Selecting a node or relationship type can be done by clicking the corresponding label in the the appropriate list, and then clicking the \textbf{use selected} button (this button will only activate if you have selected an appropriate item). Once you have selected a entity or relationship type, it will disappear from the list. This also means that entities can never have a relationship to themselves. 
+In the middle of the dialog, a schematic overview is offered of the nodes and relationship type that the user has selected (see figure \ref{fig:relationshipdialog3}). Note that the schematic overview also indicates whether the relationship type is a directed or not. This schematic form is also used as the label for relationships, as we will soon see.
+
+\begin{figure}[h!]
+  \centering
+  \caption{The relationship dialog with entities and a relationship type selected.}
+  \includegraphics[width=100mm]{Screenshot_20.pdf}
+  \label{fig:relationshipdialog3}
+\end{figure}
+
+Once you have created one or more relationships, they will appear in the \textbf{Relationship pool} in the main dialog (see figure \ref{fig:relationshippool}).
+
 \subsection{Editing relationships}
 \label{sec:editingrelationships}
 
+Editing a relationship after it is created works similar to editing attributes, categories, entities or relationship types. Simply select the relationship in the list, and then click the \textbf{Edit highlighted relationship} button. This will open the relationship dialog, but with the corresponding \textbf{source node}, \textbf{relationship type} and \textbf{target node} already selected.
 
+\begin{figure}[h!]
+  \centering
+  \caption{Some new relationships in the pool.}
+  \includegraphics[width=100mm]{Screenshot_21.pdf}
+  \label{fig:relationshippool}
+\end{figure}
+
+It is possible that you also want to edit properties of one of the selected entities, or of the relationship type after you have selected them. To edit one of the selected entities, click the \textbf{Edit left assigned entity} button, or the \textbf{Edit right assigned entity button}. To edit the selected relationship type, click the \textbf{Edit assigned relationship type} button.
 
 \subsection{Removing relationships}
 \label{sec:removingrelationships}
 
+As with all other objects we have discussed so far (and for the same reasons), it is only possible to remove relationships that are not currently in use. Unused relationships can be removed by clicking the \textbf{Remove unused relationships} button.
+
+If there is a particular relationship that you want to remove, but it has already been assigned to one or more incidents, then I advice you to use the following approach: Export the data that you have coded so far, and open the \textbf{"Incidents\textunderscore to\textunderscore Relationships\textunderscore Edges.csv"} to see to which incidents this relationship has been assigned. Then use the \textbf{Jump to} dialog to jump to the indexes of the corresponding incidents, such that you can unassign the relationship you want to remove from these incidents (use the filter field to find the relationship more quickly).
+
+\section{Assigning and unassigning relationships}
+\label{sec:assigningunassigningrelationships}
+
+Once you have created relationships, you can start assigning them to incidents. This can be done by selecting the relationship in the \textbf{Relationship pool}, and then clicking the assign button (\textbf{\guillemotleft}). The relationship will move from the \textbf{Relationship pool} to the list of \textbf{Indicated relationships}, which means that we now consider the current incident as an indicator of the relationship. In figure \ref{fig:relationshipsassigned} we have assigned two relationships to the current incident, based on the description of the incident.
+
+In this case, we have also done something else: we have written a memo about the relationship. These memos are created using the bottom-most field in the main dialog. I chose to allow the user to edit these memos here, because I assumed that memos about relationships would be created primarily in the context of how they relate to the data. All you have to do to create a memo for a relationship is to select the relationship in the list \textbf{Indicated relationships} or in the \textbf{Relationship pool}, and then type the memo in the field. There is no need to save the memo in any way. Everything you type is recorded instantly. If you want to remove a memo, simply delete the text.
+
+The relationship memos thus are similar to attribute values. However, unlike attribute values, relationship memos can also be written for relationships that are not currently assigned, because the memo is for the relationship in general, and not in relation to the specific incident that is currently selected\footnote{This is just a design choice that I made, because I think the memos will be more useful this way.}.
+
+\begin{figure}[h!]
+  \centering
+  \caption{Relationships assigned to incident.}
+  \includegraphics[width=100mm]{Screenshot_22.pdf}
+  \label{fig:relationshipsassigned}
+\end{figure}
+
+You can unassign a relationship by selecting it in the list of \textbf{Indicated relationships}, and then clicking the unassign button (\textbf{\guillemotright}). The relationship will move from the list of \textbf{Indicated relationships} to the \textbf{Relationship pool}, and the current incident will no longer serve as an indicator for this relationship. The memo that was assigned to the relationship will remain intact.
+
+And that covers all important things you need to know about the relationship module. We have now covered everything you need to know about using the program itself. In the next chapter I discuss a few things that you could potentially do with the data that you have coded. 
 
 \chapter{What is next?}
 \label{chap:whatisnext}
 
-So, you have coded a data set (see chapter \ref{chap:usingtheprogram2}), and you have exported your coded data (see section \ref{sec:exportingdata}), resulting in a bunch of files in the \textbf{``export/''} folder. What can we actually do with those files now? 
+So, you have coded a data set (see chapter \ref{chap:usingtheprogram2}), and you have exported your coded data (see section \ref{sec:exportingdata}), resulting in a bunch of files in the \textbf{``export/''} folder. What can we actually do with those files now? I think there are many possibilities, and I will not explore all of these here, but let me mention at least a few\footnote{If you have ideas that you would like to share, please contact me (see chapter \ref{chap:contactdetails})!}.
+
+\section{Graph databases}
+\label{sec:graphdatasets}
+
+Lately, I have been experimenting a lot with the use of graph databases, which are, in very simple terms, databases in which all data are either stored as \textbf{nodes}, as \textbf{relationships between nodes}, or as \textbf{properties} of nodes or relationships. For me, storing data this way is ideal, because I usually like to present event data in some ``networked form'', and with graph databases there are very few steps required between storing data and presenting data in such a form. As discussed in section \ref{sec:partofbiggerprogram}, I intend to integrate the \textbf{\emph{Event Coder}} program in a larger program at some point. My intention is for this program to interface directly with a graph database, without the user ever having to worry about how this works. For now, however, the data that the \textbf{\emph{Event Coder}} program exports have to be imported into a graph database manually. I will not offer a detailed example of how to do this here, because it is well beyond the scope of this manual\footnote{Read as: ``I really do not feel like working out such an example right now.''}.
+
+Figure \ref{fig:graphdatabaseexample} shows a screenshot of a some of our coded data after I have imported it into a Neo4j graph data base\footnote{See \url{https://neo4j.com/}.}). This screenshot actually gives a pretty good picture of the kind of data structures that my programs will eventually aim for. Some of you may wonder why I do not simply use a tabular structure for our data. One good reason to use graph structures to structure your data, is that it is relatively easy to convert graph structured data in tabular form, while the graph form allows you to store objects and their relationships in a much more efficient way. For example, say that I want to create a simple table of our entities and their attributes. This is can be achieved relatively easily (see figure \ref{fig:attributestable} for an example of such a table produced with Neo4j).
+
+\begin{figure}[h!]
+  \centering
+  \caption{Some of our coded data stored in a graph database.}
+  \includegraphics[width=100mm]{Screenshot_23.pdf}
+  \label{fig:graphdatabaseexample}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \caption{Our table of entities and their attributes.}
+  \includegraphics[width=80mm]{Screenshot_24.pdf}
+  \label{fig:attributestable}
+\end{figure}
+
+This does not actually tell you anything that you could do with these data in terms of analysis, but I hope it does make clear that it creates a lot of flexibility in how you store, present, and structure your data. Once you manage to put your data into a graph structure, it is easy to convert your data in the various forms required by different software packages.
+
+\section{Visualising relationships}
+\label{sec:visualisingrelationships}
+
+We do not actually have to first import our coded data into a graph database before we can make interesting visualisations. Some people may only be interested in creating an overview of which attributes are associated with which incidents, or an overview of all the relationships that are indicated by the incidents that we coded. Such overviews can be easily created with network visualisation software. I have mentioned several times that my favourite network visualisation tool is Gephi\footnote{See \url{https://gephi.org/}.}. I have therefore structured many of the exported files such that you can immediately import them into Gephi. The visualisation illustrated in figure \ref{fig:network} was created in a few minutes. I simply imported the file \textbf{``Entity\textunderscore Nodes.csv''} as a node list, and the file \textbf{"Entity\textunderscore Edges.csv"} as an edge list from Gephi's data laboratory, created a simple layout with the Gephi's Force Atlas 2 layout, changed the colour of the nodes, made sure that the labels of the edges show up, and then exported the result, after fine-tuning the visualisation in Gephi's preview window. 
+
+\begin{figure}[h!]
+  \centering
+  \caption{Visualising the relationships between entities.}
+  \includegraphics[width=80mm]{Diagram_5.pdf}
+  \label{fig:network}
+\end{figure}
+
+You can use this procedure with most of the files that the \textbf{\emph{Event Coder}} program exports. Eventually, you could just reproduce the type of graphs that we saw in figure \ref{fig:graphdatabaseexample}, although Gephi was originally not intended to be used as a graph database\footnote{There is a plugin for Gephi that allows you to use Gephi as an interface for a Neo4j graph database. At the time I was writing this manual, this plugin was not yet updated for the latest version of Gephi.}.
+
+\section{Creating event graphs}
+\label{sec:creatingeventgraphs}
+
+Another program that I have recently created is the \emph{\textbf{Linkage Coder}} program. This program imports the exact same types of data sets as the \emph{\textbf{Event Coder}} program, but its purpose is different: Rather than being a tool for qualifyign incidents (with attributes and relationships), the \textbf{\emph{Linkage Coder}} program can be used to identify relationships \emph{between} incidents. For example, certain actions in a given data set may have occurred \emph{in response to} other actions in that data set. The \emph{\textbf{Linkage Coder}} program is designed to identify such linkages and make them explicit (through qualitative coding).
+
+For me, the \textbf{\emph{Event Coder}} program and the \textbf{\emph{Linkage Coder}} program are intimately related. In fact, I plan to integrate both of them in a larger program in the future (see section \ref{sec:partofbiggerprogram}). I use the joint output of the programs to create \emph{event graphs}. These are graphs in which the nodes represent events, and the edges represent relationships between events\footnote{For an example of a publication in which event graphs are used, see Spekkink, W. A. H., \& Boons, F. A. A. (2016). The Emergence of Collaborations. \emph{Journal of Public Administration Research and Theory}, 26(4), 613–630.}. The \textbf{\emph{Linkage Coder}} program helps me to create the basic structure of event graphs, and the \textbf{\emph{Event Coder}} program helps me to qualify the events, for example, by identifying what types of actions these events represent.
+
+Figure \ref{fig:eventgraph} shows a visualisation of an event graph that I recently used in a presentation. In this graph, the events from left to right based on the order of their occurrence. The colours represent different types of interactions (something we could identify with the \emph{\textbf{Event Coder}} program), and the edges represent which interactions occurred in response to which other interactions (something we could identify with the \textbf{\emph{Linkage Coder}} program).
+
+\begin{figure}[h!]
+  \centering
+  \caption{Example of event graph.}
+  \includegraphics[width=80mm]{Diagram_6.png}
+  \label{fig:eventgraph}
+\end{figure}
+
+\section{Future examples}
+\label{sec:futureexamples}
+
+This is it for now. I plan to add more examples in the future, as my own work (using this program) progresses. 
 
 
 \chapter{Contact details}
 \label{chap:contactdetails}
+
+At the time of writing this manual, I work as a Research Associate at the Sustainable Consumption Institute (SCI) of the University of Manchester.
+
+Wouter Spekkink \\
+The Sustainable Consumption Institute \\
+The University of Manchester \\
+188 Waterloo Place, Oxford Road \\
+M13 9PL, Manchester \\
+The United Kingdom
+
+Email address (office): \href{mailto:wouter.spekkink@manchester.ac.uk}{wouter.spekkink@manchester.ac.uk} \\
+Email address (personal): \href{mailto:wouterspekkink@gmail.com}{wouterspekkink@gmail.com}
+
+Website: \url{http://www.wouterspekkink.org} \\
+Github page (where I upload source code): \url{https://github.com/WouterSpekkink}
 
 
 

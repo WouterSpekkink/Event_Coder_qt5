@@ -1424,10 +1424,18 @@ void MainDialog::finalBusiness() {
 }
 
 bool MainDialog::eventFilter(QObject *target, QEvent *event) {
-  if (target == valueField || relMemoField) {
+  if (target == valueField || target == relMemoField) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
       if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar) {
+	return true;
+      }
+    }
+  }
+  if (target == valueField) {
+    if (event->type() == QEvent::KeyPress) {
+      QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+      if (keyEvent->key() == Qt::Key_Comma) {
 	return true;
       }
     }

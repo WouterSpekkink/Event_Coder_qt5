@@ -656,7 +656,7 @@ void EntityDialog::saveAndClose() {
 }
 
 bool EntityDialog::eventFilter(QObject *target, QEvent *event) {
-  if (target == valueField || nameField || descriptionField) {
+  if (target == valueField || target == nameField || target == descriptionField) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
       if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar) {
@@ -664,5 +664,13 @@ bool EntityDialog::eventFilter(QObject *target, QEvent *event) {
       }
     }
   }
+  if (target == nameField || target == valueField) {
+    if (event->type() == QEvent::KeyPress) {
+      QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+      if (keyEvent->key() == Qt::Key_Comma) {
+	return true;
+      }
+    }
+  }  
   return QObject::eventFilter(target, event);
 }

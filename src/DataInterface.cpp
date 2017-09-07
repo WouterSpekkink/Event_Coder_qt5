@@ -1288,7 +1288,16 @@ void DataInterface::importCodes(const QString &fileName) {
 
   // We beed to declare a vector for holding row data here, for scope reasons.
   std::vector <std::string> currentRow;
- 
+
+  // We will eventually put the columns that match in the following vector.
+  std::vector <std::string> matchColumns;
+
+  // This vector stores the names of the columns we need to match.
+  QVector<QString> Qmatch; 
+
+  // A boolean to check if the user wants to mark new rows or not.
+  bool markNew = false;
+  
   // Then we read all the lines of data in the input file.
   while(myFile) {
     //The buffer will hold one line of raw data temporarily, and we will do some processing on it.
@@ -1394,12 +1403,51 @@ void DataInterface::importCodes(const QString &fileName) {
 	  inRow = false;
 	  if (!headersImported) {
 	    headersImported =  true; // The headers should have been imported after the first row.
+	    std::vector <std::string>::iterator sIt;
+	    std::vector <std::string>::iterator sIt2;
+	    for (sIt = header.begin(); sIt != header.end(); sIt++) {
+	      for (sIt2 = tempHeader.begin(); sIt2 != tempHeader.end(); sIt2++) {
+		if (*sIt == *sIt2) {
+		  QString temp = QString::fromUtf8((*sIt).c_str());
+		  Qmatch.push_back(temp);
+		}
+	      }
+	    }
+	    // First we need the user to select which columns should match between the two files.
+	    ImportCodesDialog *import = new ImportCodesDialog(0, Qmatch); // A dialog where these columns will be selected.
+	    import->deleteLater(); // We need to be able to access this after closure.
+	    import->exec(); // Open te dialog.
+	
+	    Qmatch = import->getColumnNames(); // Recover the column names.
+	
+	    markNew = import->getMarked(); //SHOULD REACTIVE THIS LATER(?)
+	
+	    delete import; // And now we can delete the dialog.
+
+	    // Let us convert the column names to strings.
+	    QVectorIterator<QString> cI(Qmatch);
+	    cI.toFront();
+	    while (cI.hasNext()) {
+	      QString temp = cI.next();
+	      matchColumns.push_back(temp.toStdString());
+	    }
+
+	    if (matchColumns.size() == 0) {
+	      QPointer <QMessageBox> warningBox = new QMessageBox;
+	      warningBox->addButton(QMessageBox::Ok);
+	      warningBox->setIcon(QMessageBox::Warning);
+	      warningBox->setText("WARNING: No columns were selected!");
+	      warningBox->exec();
+	      return;
+	    }
 	  }
 	  // And we can also push back the data read so far to rowData.
 	  tempRowData.push_back(currentRow);
 	  currentRow.clear();
 	}
 	// We only need to import the headers once.
+	
+	// We first fill Qmatch with common column headers (those that are not common cannot be matched).
 	break;
       }
     case memosField:
@@ -1728,196 +1776,152 @@ void DataInterface::importCodes(const QString &fileName) {
   }
 
   // Now we compare the file we just loaded to the file that is being coded currently.
-  QVector<QString> Qmatch; // This vector stores the names of the columns we need to match.
-
-  // We first fill Qmatch with common column headers (those that are not common cannot be matched).
-  std::vector <std::string>::iterator sIt;
-  std::vector <std::string>::iterator sIt2;
-  for (sIt = header.begin(); sIt != header.end(); sIt++) {
-    for (sIt2 = tempHeader.begin(); sIt2 != tempHeader.end(); sIt2++) {
-      if (*sIt == *sIt2) {
-	QString temp = QString::fromUtf8((*sIt).c_str());
-	Qmatch.push_back(temp);
-      }
-    }
-  }
   
-  // First we need the user to select which columns should match between the two files.
-  ImportCodesDialog *import = new ImportCodesDialog(0, Qmatch); // A dialog where these columns will be selected.
-  import->deleteLater(); // We need to be able to access this after closure.
-  import->exec(); // Open te dialog.
- 
-  Qmatch = import->getColumnNames(); // Recover the column names.
-
-  bool markNew = import->getMarked(); //SHOULD REACTIVE THIS LATER(?)
-  
-  delete import; // And now we can delete the dialog. 
-
-  // Let us convert the column names to strings.
-  std::vector <std::string> matchColumns;
-  QVectorIterator<QString> cI(Qmatch);
-  cI.toFront();
-  while (cI.hasNext()) {
-    QString temp = cI.next();
-    matchColumns.push_back(temp.toStdString());
-  }
-
-  // We only want to search for matches if columns were actually selected.
-  if (matchColumns.size() > 0) {
-    // IS SHOULD WRITE THIS CODE AFTER FIGURING OUT HOW THE CODES WILL
-    // EVENTUALLY WORK
-    std::vector <int> indexOriginal;
-    std::vector <int> indexLoaded;
-    int goal= 0;
-    int counter = 0;
+  std::vector <int> indexOriginal;
+  std::vector <int> indexLoaded;
+  int goal= 0;
+  int counter = 0;
     
-    for (std::vector<std::string>::size_type i = 0; i != matchColumns.size(); i++) {
-      for (std::vector<std::string>::size_type j = 0; j != header.size(); j++) {
-	if (header[j] == matchColumns[i]) {
-	  indexOriginal.push_back(j);
-	  goal++;
-	}
+  for (std::vector<std::string>::size_type i = 0; i != matchColumns.size(); i++) {
+    for (std::vector<std::string>::size_type j = 0; j != header.size(); j++) {
+      if (header[j] == matchColumns[i]) {
+	indexOriginal.push_back(j);
+	goal++;
       }
     }
-    for (std::vector <std::string>::size_type i = 0; i != matchColumns.size(); i++) {
-      for (std::vector <std::string>::size_type j = 0; j != tempHeader.size(); j++) {
-	if (tempHeader[j] == matchColumns[i]) {
-	  indexLoaded.push_back(j);
-	}
+  }
+  for (std::vector <std::string>::size_type i = 0; i != matchColumns.size(); i++) {
+    for (std::vector <std::string>::size_type j = 0; j != tempHeader.size(); j++) {
+      if (tempHeader[j] == matchColumns[i]) {
+	indexLoaded.push_back(j);
       }
     }
-    bool rowFound = false;
-    std::vector <std::vector <std::string> > eventPairs;
-    for (std::vector <std::vector <std::string> >::size_type i = 0; i != rowData.size(); i++) {
-      for (std::vector <std::vector <std::string> >::size_type j = 0; j != tempRowData.size(); j++) {
-	counter = 0;
-	for (std::vector<int>::size_type k = 0; k != indexOriginal.size(); k++) {
-	  for (std::vector<int>::size_type l = 0; l != indexLoaded.size(); l++) {
-	    if (rowData[i][indexOriginal[k]] == tempRowData[j][indexLoaded[l]]) {
-	      counter++;
-	    }
+  }
+  bool rowFound = false;
+  std::vector <std::vector <std::string> > eventPairs;
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != rowData.size(); i++) {
+    for (std::vector <std::vector <std::string> >::size_type j = 0; j != tempRowData.size(); j++) {
+      counter = 0;
+      for (std::vector<int>::size_type k = 0; k != indexOriginal.size(); k++) {
+	for (std::vector<int>::size_type l = 0; l != indexLoaded.size(); l++) {
+	  if (rowData[i][indexOriginal[k]] == tempRowData[j][indexLoaded[l]]) {
+	    counter++;
 	  }
 	}
-	if (counter == goal) {
-	  rowFound = true;
-	  std::stringstream ss;
-	  ss << j;
-	  std::string currentEvent = ss.str();
-	  ss.clear();
-	  ss.str(std::string());
-	  ss << i;
-	  std::string newEvent = ss.str();
-	  std::vector <std::string> tempPair;
-	  tempPair.push_back(currentEvent);
-	  tempPair.push_back(newEvent);
-	  eventPairs.push_back(tempPair);
-	}
       }
-      // NEW CODE
-      if (rowFound == false) {
+      if (counter == goal) {
+	rowFound = true;
 	std::stringstream ss;
+	ss << j;
+	std::string currentEvent = ss.str();
+	ss.clear();
+	ss.str(std::string());
 	ss << i;
-	std::string tempIndex = ss.str();
-	// This one works.
-	for (std::vector <std::vector <std::string> >::size_type f = 0; f != memos.size();) {
-	  if (memos[f][0] == tempIndex) {
-	    memos.erase(memos.begin() + f);
+	std::string newEvent = ss.str();
+	std::vector <std::string> tempPair;
+	tempPair.push_back(currentEvent);
+	tempPair.push_back(newEvent);
+	eventPairs.push_back(tempPair);
+      }
+    }
+    // NEW CODE
+    if (rowFound == false) {
+      std::stringstream ss;
+      ss << i;
+      std::string tempIndex = ss.str();
+      // This one works.
+      for (std::vector <std::vector <std::string> >::size_type f = 0; f != memos.size();) {
+	if (memos[f][0] == tempIndex) {
+	  memos.erase(memos.begin() + f);
+	} else {
+	  f++;
+	}
+      }
+      std::vector <std::vector <std::string> >::iterator f;
+      std::vector <std::string>::iterator g;
+      for (f = assignedIncidentAttributes.begin(); f != assignedIncidentAttributes.end();) {
+	for (g = f->begin() + 1; g != f->end();) {
+	  if (*g == tempIndex) {
+	    f->erase(g);
 	  } else {
-	    f++;
+	    g++;
 	  }
 	}
-	std::vector <std::vector <std::string> >::iterator f;
-	std::vector <std::string>::iterator g;
-	for (f = assignedIncidentAttributes.begin(); f != assignedIncidentAttributes.end();) {
-	  for (g = f->begin() + 1; g != f->end();) {
-	    if (*g == tempIndex) {
-	      f->erase(g);
-	    } else {
-	      g++;
-	    }
-	  }
-	  if (f->size() < 2) {
-	    assignedIncidentAttributes.erase(f);
+	if (f->size() < 2) {
+	  assignedIncidentAttributes.erase(f);
+	} else {
+	  f++;
+	}
+      }
+      for (f = incidentValues.begin(); f != incidentValues.end();) {
+	std::vector<std::string> currentValue = *f;
+	if (*(f->begin() + 1) == tempIndex) {
+	  incidentValues.erase(f);
+	} else {
+	  f++;
+	}
+      }
+      for (f = assignedRelationships.begin(); f != assignedRelationships.end();) {
+	for (g = f->begin() + 1; g != f->end();) {
+	  if (*g == tempIndex) {
+	    f->erase(g);
 	  } else {
-	    f++;
+	    g++;
 	  }
 	}
-	for (f = incidentValues.begin(); f != incidentValues.end();) {
-	  std::vector<std::string> currentValue = *f;
-	  if (*(f->begin() + 1) == tempIndex) {
-	    incidentValues.erase(f);
-	  } else {
-	    f++;
-	  }
-	}
-	for (f = assignedRelationships.begin(); f != assignedRelationships.end();) {
-	  for (g = f->begin() + 1; g != f->end();) {
-	    if (*g == tempIndex) {
-	      f->erase(g);
-	    } else {
-	      g++;
-	    }
-	  }
-	  if (f->size() < 2) {
-	    assignedRelationships.erase(f);
-	  } else {
-	    f++;
-	  } 
-	}
-      }
-      // END NEW CODE
-      if (rowFound == false && markNew == true) {
-	eventFlagIndex[i] = true;
-      } else {
-	rowFound = false;
+	if (f->size() < 2) {
+	  assignedRelationships.erase(f);
+	} else {
+	  f++;
+	} 
       }
     }
-    for (std::vector <std::vector <std::string> >::size_type i = 0; i != memos.size(); i++) {
-      std::vector<std::string> currentMemo = memos[i];
-      for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
-	std::vector<std::string> currentPair = eventPairs[j];
-	if (currentMemo[0] == currentPair[0]) {
-	  memos[i][0] = currentPair[1];
+    // END NEW CODE
+    if (rowFound == false && markNew == true) {
+      eventFlagIndex[i] = true;
+    } else {
+      rowFound = false;
+    }
+  }
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != memos.size(); i++) {
+    std::vector<std::string> currentMemo = memos[i];
+    for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
+      std::vector<std::string> currentPair = eventPairs[j];
+      if (currentMemo[0] == currentPair[0]) {
+	memos[i][0] = currentPair[1];
+      }
+    }
+  }
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != assignedIncidentAttributes.size(); i++) {
+    std::vector<std::string> currentAttribute = assignedIncidentAttributes[i];
+    for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
+      std::vector<std::string> currentPair = eventPairs[j];
+      for (std::vector<std::string>::size_type k = 1; k != currentAttribute.size(); k++) {
+	if (currentAttribute[k] == currentPair[0]) {
+	  assignedIncidentAttributes[i][k] = currentPair[1];
 	}
       }
     }
-    for (std::vector <std::vector <std::string> >::size_type i = 0; i != assignedIncidentAttributes.size(); i++) {
-      std::vector<std::string> currentAttribute = assignedIncidentAttributes[i];
-      for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
-	std::vector<std::string> currentPair = eventPairs[j];
-	for (std::vector<std::string>::size_type k = 1; k != currentAttribute.size(); k++) {
-	  if (currentAttribute[k] == currentPair[0]) {
-	    assignedIncidentAttributes[i][k] = currentPair[1];
-	  }
+  }
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != assignedRelationships.size(); i++) {
+    std::vector<std::string> currentRelationship = assignedRelationships[i];
+    for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
+      std::vector<std::string> currentPair = eventPairs[j];
+      for (std::vector<std::string>::size_type k = 1; k != currentRelationship.size(); k++) {
+	if (currentRelationship[k] == currentPair[0]) {
+	  assignedRelationships[i][k] = currentPair[1];
 	}
       }
     }
-    for (std::vector <std::vector <std::string> >::size_type i = 0; i != assignedRelationships.size(); i++) {
-      std::vector<std::string> currentRelationship = assignedRelationships[i];
-      for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
-	std::vector<std::string> currentPair = eventPairs[j];
-	for (std::vector<std::string>::size_type k = 1; k != currentRelationship.size(); k++) {
-	  if (currentRelationship[k] == currentPair[0]) {
-	    assignedRelationships[i][k] = currentPair[1];
-	  }
-	}
+  }
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != incidentValues.size(); i++) {
+    std::vector<std::string> currentValue = incidentValues[i];
+    for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
+      std::vector<std::string> currentPair = eventPairs[j];
+      if (currentValue[1] == currentPair[0]) {
+	incidentValues[i][1] = currentPair[1];
       }
     }
-    for (std::vector <std::vector <std::string> >::size_type i = 0; i != incidentValues.size(); i++) {
-      std::vector<std::string> currentValue = incidentValues[i];
-      for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
-	std::vector<std::string> currentPair = eventPairs[j];
-	if (currentValue[1] == currentPair[0]) {
-	  incidentValues[i][1] = currentPair[1];
-	}
-      }
-    }
-  } else { // If no columns were selected, we show a warning, and do nothing else.
-    QPointer <QMessageBox> warningBox = new QMessageBox;
-    warningBox->addButton(QMessageBox::Ok);
-    warningBox->setIcon(QMessageBox::Warning);
-    warningBox->setText("WARNING: No columns were selected!");
-    warningBox->exec();
   }
 }
  

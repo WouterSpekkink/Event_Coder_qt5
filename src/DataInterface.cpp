@@ -1241,7 +1241,6 @@ void DataInterface::importCodes(const QString &fileName) {
   std::vector<std::string> tempHeader;
   std::vector <std::vector <std::string> > tempRowData;
   memos.clear();
-
   relationMemos.clear();
   incidentAttributes.clear();
   assignedIncidentAttributes.clear();
@@ -1266,6 +1265,8 @@ void DataInterface::importCodes(const QString &fileName) {
   // Then we make some strings that we need to store data temporarily.
   std::string eventIndex;
   std::string separator;
+  std::vector<std::string> tempMemos;
+  std::vector<std::string> tempRelMemos;
 
   // Set up an file instream for the input file.
   std::ifstream myFile (loadFile.c_str());
@@ -1812,6 +1813,59 @@ void DataInterface::importCodes(const QString &fileName) {
 	  eventPairs.push_back(tempPair);
 	}
       }
+      // NEW CODE
+      if (rowFound == false) {
+	std::stringstream ss;
+	ss << i;
+	std::string tempIndex = ss.str();
+	// This one works.
+	for (std::vector <std::vector <std::string> >::size_type f = 0; f != memos.size();) {
+	  if (memos[f][0] == tempIndex) {
+	    memos.erase(memos.begin() + f);
+	  } else {
+	    f++;
+	  }
+	}
+	std::vector <std::vector <std::string> >::iterator f;
+	std::vector <std::string>::iterator g;
+	for (f = assignedIncidentAttributes.begin(); f != assignedIncidentAttributes.end();) {
+	  for (g = f->begin() + 1; g != f->end();) {
+	    if (*g == tempIndex) {
+	      f->erase(g);
+	    } else {
+	      g++;
+	    }
+	  }
+	  if (f->size() < 2) {
+	    assignedIncidentAttributes.erase(f);
+	  } else {
+	    f++;
+	  }
+	}
+	for (f = incidentValues.begin(); f != incidentValues.end();) {
+	  std::vector<std::string> currentValue = *f;
+	  if (*(f->begin() + 1) == tempIndex) {
+	    incidentValues.erase(f);
+	  } else {
+	    f++;
+	  }
+	}
+	for (f = assignedRelationships.begin(); f != assignedRelationships.end();) {
+	  for (g = f->begin() + 1; g != f->end();) {
+	    if (*g == tempIndex) {
+	      f->erase(g);
+	    } else {
+	      g++;
+	    }
+	  }
+	  if (f->size() < 2) {
+	    assignedRelationships.erase(f);
+	  } else {
+	    f++;
+	  } 
+	}
+      }
+      // END NEW CODE
       if (rowFound == false && markNew == true) {
 	eventFlagIndex[i] = true;
       } else {

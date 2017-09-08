@@ -1775,13 +1775,16 @@ void DataInterface::importCodes(const QString &fileName) {
     }
   }
 
-  // Now we compare the file we just loaded to the file that is being coded currently.
-  
+  /* 
+     Now we compare the file we just loaded to the file that is being coded currently.
+     We first create some objects that we will use throughout.
+  */
   std::vector <int> indexOriginal;
   std::vector <int> indexLoaded;
   int goal= 0;
   int counter = 0;
-    
+
+  // The first step is to identify the indexes of the columns that we need to inspect (for both files).
   for (std::vector<std::string>::size_type i = 0; i != matchColumns.size(); i++) {
     for (std::vector<std::string>::size_type j = 0; j != header.size(); j++) {
       if (header[j] == matchColumns[i]) {
@@ -1797,16 +1800,25 @@ void DataInterface::importCodes(const QString &fileName) {
       }
     }
   }
+
+  /*
+    Now we are ready to inspect the files. First we will walk through the new file, 
+    and the fold file (the one that was imported), to find any rows in the new file that
+    are not present in the old file. These are new rows.
+
+    If we find a row that is present in both files, then we record their indexes, so tat
+    we can translate the codes associated with the old file to the codes associated with
+    the new file.
+  */
   bool rowFound = false;
   std::vector <std::vector <std::string> > eventPairs;
+  std::vector <std::vector <std::vector <std::string> >::size_type> removeCodes;
   for (std::vector <std::vector <std::string> >::size_type i = 0; i != rowData.size(); i++) {
     for (std::vector <std::vector <std::string> >::size_type j = 0; j != tempRowData.size(); j++) {
       counter = 0;
       for (std::vector<int>::size_type k = 0; k != indexOriginal.size(); k++) {
-	for (std::vector<int>::size_type l = 0; l != indexLoaded.size(); l++) {
-	  if (rowData[i][indexOriginal[k]] == tempRowData[j][indexLoaded[l]]) {
-	    counter++;
-	  }
+	if (rowData[i][indexOriginal[k]] == tempRowData[j][indexLoaded[k]]) {
+	  counter++;
 	}
       }
       if (counter == goal) {
@@ -1824,65 +1836,101 @@ void DataInterface::importCodes(const QString &fileName) {
 	eventPairs.push_back(tempPair);
       }
     }
-    // NEW CODE
     if (rowFound == false) {
-      std::stringstream ss;
-      ss << i;
-      std::string tempIndex = ss.str();
-      // This one works.
-      for (std::vector <std::vector <std::string> >::size_type f = 0; f != memos.size();) {
-	if (memos[f][0] == tempIndex) {
-	  memos.erase(memos.begin() + f);
-	} else {
-	  f++;
+      removeCodes.push_back(i);
+      if (markNew == true) {
+	eventFlagIndex[i] = true;
+      }
+    } else {
+      rowFound = false;
+    }
+  }
+
+  /*
+    I had to add the block below for cases where the new data set misses rows that
+    were present in the old data set. This block of code records the indexes of these rows,
+    and then it makes sure that all the codes that have this index are removed.
+
+    This has to be done before translating old indexes into new ones, because otherwise we
+    risk removing codes that should be kept.
+  */
+  std::vector<std::vector <std::vector <std::string> >::size_type> missingOldRows; 
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != tempRowData.size(); i++) {
+    for (std::vector <std::vector <std::string> >::size_type j = 0; j != rowData.size(); j++) {
+      counter = 0;
+      for (std::vector<int>::size_type k = 0; k != indexOriginal.size(); k++) {
+	if (tempRowData[i][indexOriginal[k]] == rowData[j][indexLoaded[k]]) {
+	  counter++;
 	}
       }
-      std::vector <std::vector <std::string> >::iterator f;
-      std::vector <std::string>::iterator g;
-      for (f = assignedIncidentAttributes.begin(); f != assignedIncidentAttributes.end();) {
-	for (g = f->begin() + 1; g != f->end();) {
-	  if (*g == tempIndex) {
-	    f->erase(g);
-	  } else {
-	    g++;
-	  }
+      if (counter == goal) {
+	rowFound = true;
+      }
+    }
+    if (rowFound == false) {
+      missingOldRows.push_back(i);
+    } else {
+      rowFound = false;
+    }
+  }
+
+  std::vector<std::vector <std::vector <std::string> >::size_type>::iterator mI;
+  for (mI = missingOldRows.begin(); mI != missingOldRows.end(); mI++) {
+    std::stringstream ss;
+    ss << *mI;
+    std::string tempIndex = ss.str();
+    for (std::vector <std::vector <std::string> >::size_type f = 0; f != memos.size();) {
+      if (memos[f][0] == tempIndex) {
+	memos.erase(memos.begin() + f);
+      } else {
+	f++;
+      }
+    }
+    std::vector <std::vector <std::string> >::iterator f;
+    std::vector <std::string>::iterator g;
+    for (f = assignedIncidentAttributes.begin(); f != assignedIncidentAttributes.end();) {
+      for (g = f->begin() + 1; g != f->end();) {
+	if (*g == tempIndex) {
+	  f->erase(g);
+	} else {
+	  g++;
 	}
+      }
 	if (f->size() < 2) {
 	  assignedIncidentAttributes.erase(f);
 	} else {
 	  f++;
 	}
-      }
-      for (f = incidentValues.begin(); f != incidentValues.end();) {
-	std::vector<std::string> currentValue = *f;
-	if (*(f->begin() + 1) == tempIndex) {
-	  incidentValues.erase(f);
-	} else {
-	  f++;
-	}
-      }
-      for (f = assignedRelationships.begin(); f != assignedRelationships.end();) {
-	for (g = f->begin() + 1; g != f->end();) {
-	  if (*g == tempIndex) {
-	    f->erase(g);
-	  } else {
-	    g++;
-	  }
-	}
-	if (f->size() < 2) {
-	  assignedRelationships.erase(f);
-	} else {
-	  f++;
-	} 
+    }
+    for (f = incidentValues.begin(); f != incidentValues.end();) {
+      std::vector<std::string> currentValue = *f;
+      if (*(f->begin() + 1) == tempIndex) {
+	incidentValues.erase(f);
+      } else {
+	f++;
       }
     }
-    // END NEW CODE
-    if (rowFound == false && markNew == true) {
-      eventFlagIndex[i] = true;
-    } else {
-      rowFound = false;
+    for (f = assignedRelationships.begin(); f != assignedRelationships.end();) {
+      for (g = f->begin() + 1; g != f->end();) {
+	if (*g == tempIndex) {
+	  f->erase(g);
+	} else {
+	  g++;
+	}
+      }
+      if (f->size() < 2) {
+	assignedRelationships.erase(f);
+      } else {
+	f++;
+      } 
     }
   }
+  /*
+    We have now finished removing the codes associated with rows that were removed.
+    The next step is to translate all the codes from the old file to the new file.
+    Basically, this means changing the indexes that have been associated with the codes.
+  */
+    
   for (std::vector <std::vector <std::string> >::size_type i = 0; i != memos.size(); i++) {
     std::vector<std::string> currentMemo = memos[i];
     for (std::vector <std::vector <std::string> >::size_type j = 0; j != eventPairs.size(); j++) {
@@ -1921,6 +1969,61 @@ void DataInterface::importCodes(const QString &fileName) {
       if (currentValue[1] == currentPair[0]) {
 	incidentValues[i][1] = currentPair[1];
       }
+    }
+  }
+  /*
+    Another thing we need to do is to walk through all the new rows, and remove the codes associated with them.
+    These may accidentally still be assigned.
+  */
+  std::vector <std::vector <std::vector <std::string> >::size_type>::iterator rIt;
+  for (rIt = removeCodes.begin(); rIt != removeCodes.end(); rIt++) {
+    std::stringstream ss;
+    ss << *rIt;
+    std::string tempIndex = ss.str();
+    for (std::vector <std::vector <std::string> >::size_type f = 0; f != memos.size();) {
+      if (memos[f][0] == tempIndex) {
+	memos.erase(memos.begin() + f);
+      } else {
+	f++;
+      }
+    }
+    std::vector <std::vector <std::string> >::iterator f;
+    std::vector <std::string>::iterator g;
+    for (f = assignedIncidentAttributes.begin(); f != assignedIncidentAttributes.end();) {
+      for (g = f->begin() + 1; g != f->end();) {
+	if (*g == tempIndex) {
+	  f->erase(g);
+	} else {
+	  g++;
+	}
+      }
+      if (f->size() < 2) {
+	assignedIncidentAttributes.erase(f);
+      } else {
+	f++;
+      }
+    }
+    for (f = incidentValues.begin(); f != incidentValues.end();) {
+      std::vector<std::string> currentValue = *f;
+      if (*(f->begin() + 1) == tempIndex) {
+	incidentValues.erase(f);
+      } else {
+	f++;
+      }
+    }
+    for (f = assignedRelationships.begin(); f != assignedRelationships.end();) {
+      for (g = f->begin() + 1; g != f->end();) {
+	if (*g == tempIndex) {
+	  f->erase(g);
+	} else {
+	  g++;
+	  }
+      }
+      if (f->size() < 2) {
+	assignedRelationships.erase(f);
+      } else {
+	f++;
+      } 
     }
   }
 }

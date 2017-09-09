@@ -2381,7 +2381,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     std::ofstream eaEdgesOut(filePath.toStdString().c_str());
 
     eaNodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
-    eaEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";    
+    eaEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Value" << "," << "Label" << "\n";    
     
     std::vector<std::vector <std::string> >::iterator aIt;
     for (aIt = assignedEntityAttributes.begin(); aIt != assignedEntityAttributes.end(); aIt++) {
@@ -2397,7 +2397,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       eaNodesOut << currentAttribute[0] << "," << currentAttribute[0] << "," << "\"" << attDesc << "\"" << "," << "Attribute" << "\n";
       std::vector<std::string>::iterator aIt3;
       for (aIt3 = currentAttribute.begin() + 1; aIt3 != currentAttribute.end(); aIt3++) {
-	eaEdgesOut << currentAttribute[0] << "," << *aIt3 << "," << "Directed" << "," << "IS_ATTRIBUTE_OF" << "\n";
+	std::string value = "";
+	std::vector <std::vector <std::string> >::iterator valIt;
+	for (valIt = entityValues.begin(); valIt != entityValues.end(); valIt++) {
+	  if (*valIt->begin() == currentAttribute[0] && *(valIt->begin() + 1) == *aIt3) {
+	    value = *(valIt->begin() + 2);
+	  }
+	}
+	eaEdgesOut << currentAttribute[0] << "," << *aIt3 << "," << "Directed" << "," << value << "," << "IS_ATTRIBUTE_OF" <<  "\n";
       }
     }
     eaNodesOut.close();

@@ -37,6 +37,8 @@
 #include <sstream>
 #include <QMessageBox>
 #include <QPointer>
+#include <algorithm>
+#include <locale>
 #include "../include/DataInterface.h"
 
 const std::string DataInterface::IMPORTED_BEGIN = "<imported_data>";
@@ -598,7 +600,9 @@ void DataInterface::writeSave(const QString &fileName, std::vector<std::vector <
 	}
       }
     }
-  }  
+  }
+
+  
   fileOut << ASSIGNEDENTITYATTRIBUTES_END << "\n";
 
   fileOut << ENTITYVALUES_BEGIN << "\n";
@@ -675,7 +679,7 @@ void DataInterface::writeSave(const QString &fileName, std::vector<std::vector <
     }
   }
   fileOut << ASSIGNEDECATEGORIES_END << "\n";
-
+  
   fileOut << RELTYPES_BEGIN << "\n";
   std::vector <std::vector <std::string> >::iterator rtIt;
   for (rtIt = relationshipTypes.begin(); rtIt != relationshipTypes.end(); rtIt++) {
@@ -2076,14 +2080,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
   filePath.append(fileName);
   std::ofstream fileOut(filePath.toStdString().c_str());
 
-  if (!fileOut.is_open()) {
-    QPointer<QMessageBox> errorBox =  new QMessageBox;
-    errorBox->setText(tr("<b>ERROR: Cannot write file</b>"));
-    errorBox->setInformativeText("It appears impossible to open the file to write data.");
-    errorBox->exec();
-    return;
-  }
 
+  // NEW
+  fileName = "CYPHER.txt";
+  filePath = path;
+  filePath.append(fileName);
+  std::ofstream cypherOut(filePath.toStdString().c_str());
+
+  
   // Now we write the headers of this output file.
   std::vector<std::vector<std::string>::size_type> index;
 
@@ -2095,6 +2099,9 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     }
   }
 
+  cypherOut << "// Here the incidents are created. Remove this block if they were already included.\n\n";
+  
+  std::vector<std::string> cypherTemp; // NEW
   if (index.size() == 0) {
     fileOut << "Id" << "," << "Label" << "\n";
   } else {
@@ -2106,6 +2113,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       } else {
 	fileOut << "\"" << *it << "\"" << "\n";
       }
+      cypherTemp.push_back(*it);
     }
   }
 
@@ -2113,22 +2121,32 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
   std::vector <std::vector <std::string> >::iterator dIt;
   for (dIt = rowData.begin(); dIt != rowData.end(); dIt++) {
     std::vector<std::string> currentRow = *dIt;
+    std::stringstream ss;
+    ss << counter;
+    std::string curI = "I" + ss.str();
     if (index.size() == 0) {
       fileOut << counter << "," << counter << "," << "\n";
+      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << "})\n";
     } else {
       fileOut << counter << "," << counter << ",";
+      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", ";
       for (std::vector<std::vector<std::string>::size_type>::size_type i = 0;i != index.size(); i++) {
 	if (i != index.size() - 1) {
 	  fileOut << "\"" << currentRow[index[i]] << "\"" << ",";
+	  cypherOut << cypherTemp[i] << ": " << "\"" << currentRow[index[i]] << "\", ";
 	} else {
 	  fileOut << "\"" << currentRow[index[i]] << "\"" << "\n";
+	  cypherOut << cypherTemp[i] << ": " << "\"" << currentRow[index[i]] << "\"})\n";
 	}
       }
     }
     counter++;
   }
+
+  cypherOut << "\n// End of block where incidents are created. Remove the above if incidents were already included.\n\n";
   
   fileOut.close();
+    
   if (incidentAttributesBool == true) {
     fileName  = "Incident_Attributes_Nodes.csv";
     filePath = path;
@@ -2142,7 +2160,9 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     // Now we right the headers of this output file.
     nodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
     edgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "," << "Value" << "\n";
+    cypherOut << "// Start of block where attributes are created.\n\n";
     std::vector <std::vector <std::string> >::iterator iaIt;
+    int counter = 0;
     for (iaIt = assignedIncidentAttributes.begin(); iaIt != assignedIncidentAttributes.end(); iaIt++) {
       std::vector<std::string> currentAttribute = *iaIt;
       std::vector <std::vector <std::string> >::iterator uiaIt;
@@ -2155,7 +2175,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	}
       }
       nodesOut << currentAttribute[0] << "," << currentAttribute[0] << "," << "\"" << desc << "\"" << "," << "Attribute" << "\n";
+      std::stringstream ss;
+      ss << counter;
+      std::string curA = "A" + ss.str();
+      counter++;
+      cypherOut << "CREATE (" << curA  << ":Incident_Attribute {id: " << "\""
+		<< currentAttribute[0] << "\"" << ", description: " << "\"" << desc << "\"})\n"; 
       std::vector<std::string>::iterator eIt;
+      int counter2 = 0;
       for (eIt = currentAttribute.begin() + 1; eIt != currentAttribute.end(); eIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
 	std::istringstream ss(*eIt);
@@ -2169,13 +2196,22 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	    break;
 	  }
 	}
+	std::stringstream ss2;
+	ss2 << counter2;
+	counter2++;
+	std::string curI = "mI" + ss2.str();
 	edgesOut << currentAttribute[0] << "," << currentEvent + 1 << "," << "Directed" << ","
 		 << "IS_ATTRIBUTE_OF" << "," <<  "\"" << currentValue << "\"" << "\n";
+	cypherOut << "WITH " << curA << "\nMATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
+		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: " << "\"" << currentValue
+		  << "\"}]->(" << curI <<")\n"; 
       }
     }
     nodesOut.close();
     edgesOut.close();
 
+    cypherOut << "\n// End of block where incident attributes are created./n/n";
+    
     fileName  = "Incident_Attributes_Matrix.csv";
     filePath = path;
     filePath.append(fileName);
@@ -2233,7 +2269,9 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       
       nodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
       edgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
+      cypherOut << "// Start of block where incident categories are created.\n\n";
       std::vector <std::vector <std::string> >::iterator icIt;
+      int counter = 0;
       for (icIt = assignedIncidentAttributeCategories.begin(); icIt != assignedIncidentAttributeCategories.end(); icIt++) {
 	std::vector<std::string> currentCategory = *icIt;
 	std::vector <std::vector <std::string> >::iterator uicIt;
@@ -2245,14 +2283,23 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	    break;
 	  }
 	}
+	std::stringstream ss;
+	ss << counter;
+	counter++;
+	std::string curC = "C" + ss.str();
 	nodesOut << currentCategory[0] << "," << currentCategory[0] << "," << "\"" << desc << "\"" << "," << "Category" << "\n";
+	cypherOut << "CREATE (" << curC << ":Incident_Category {id: \"" << currentCategory[0] << "\", description: \""
+		  << desc << "\"})\n";  
 	std::vector<std::string>::iterator caIt;
 	for (caIt = currentCategory.begin() + 1; caIt != currentCategory.end(); caIt++) {
 	  edgesOut << *caIt << "," << currentCategory[0]  << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
+	  cypherOut << "WITH " << curC << "\n" << "MATCH (a:Incident_Attribute {id: \"" << *caIt  << "\"})\n"
+		    << "MERGE (a)-[:IS_IN_CATEGORY]->(" << curC << ")\n";
 	}
       }
       nodesOut.close();
       edgesOut.close();
+      cypherOut << "\n// End of block where incident categories are created.\n\n";
     }
   }
   if (relationshipsBool == true) {
@@ -2279,14 +2326,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     
     relNodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
     relEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "," << "Description" << "\n";
-    
     relIndNodesOut << "Id" << "," << "Label" << "," << "Memo" << "," << "Type" << "\n";
     relIndEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
-    
     relEntEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
-
+    cypherOut << "// Start of block where entity relationships are created.\n\n";
+    
     std::vector<std::vector <std::string> >tempEntities;
     std::vector<std::vector <std::string> >::iterator rIt;
+    int counter = 0;
     for (rIt = assignedRelationships.begin(); rIt != assignedRelationships.end(); rIt++) {
       std::vector<std::string> currentAssigned = *rIt;
       std::string currentMemo;
@@ -2296,17 +2343,33 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  currentMemo = currentRelMemo[1];
 	}
       }
+      std::stringstream ms;
+      ms << counter;
+      counter++;
+      std::string curR = "R" + ms.str();
       relIndNodesOut  << currentAssigned[0] << "," << currentAssigned[0] << "," << "\""
 		      << currentMemo << "\"" << "," << "Relationship" << "\n";
+      cypherOut << "CREATE (" << curR << ":Entity_Relationship {id: \"" << currentAssigned[0]
+		<< "\", memo: \"" << currentMemo << "\"})\n";   
       std::vector<std::string>::iterator arIt;
+      int counter2 = 0;
       for (arIt = currentAssigned.begin() + 1; arIt != currentAssigned.end(); arIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
 	std::istringstream ss(*arIt);
 	ss >> currentEvent;
+
+	std::stringstream ms2;
+	ms2 << counter2;
+	counter2++;
+	std::string curI = "rI" + ms2.str();
+	
 	relIndEdgesOut << currentEvent + 1 << "," << currentAssigned[0] << "," << "Directed"
 		       << "," << "IS_INDICATOR_OF" << "\n";
+	cypherOut << "WITH " << curR << "\n"
+		  << "MATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
+		  << "MERGE (" << curI << ")-[:IS_INDICATOR_OF]->(" << curR <<")\n";
       }
-      
+      int counter3 = 0;
       std::vector<std::vector <std::string> >::iterator rIt2;
       for (rIt2 = relationships.begin(); rIt2 != relationships.end(); rIt2++) {
 	std::vector<std::string> currentItem = *rIt2;
@@ -2314,6 +2377,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  std::vector<std::string> currentRelationship = currentItem;
 	  relEntEdgesOut << currentItem[1] << "," << currentItem[0] << "," << "Directed" << "," << "IS_IN_RELATIONSHIP" << "\n";
 	  relEntEdgesOut << currentItem[3] << "," << currentItem[0] << "," << "Directed" << "," << "IS_IN_RELATIONSHIP" << "\n";
+  
 	  std::string desc;
 	  std::vector <std::vector <std::string> >::iterator aeIt;
 	  for (aeIt = entities.begin(); aeIt != entities.end(); aeIt++) {
@@ -2353,23 +2417,71 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  }
 	  relEdgesOut << "\"" << currentRelationship[1] << "\"" << "," << "\"" << currentRelationship[3] << "\"" << ","
 		      << "\"" << direction << "\"" << "," << relLabel << "," "\"" << descRel << "\"" << "\n";
+
+	  std::stringstream ms;
+	  ms << counter3;
+	  counter3++;
+	  
+	  cypherOut << "SET " << curR << ".directedness = \"" << direction << "\"\nSET "<< curR << ".label = \"" << relLabel
+		    << "\"\nSET " << curR << ".description = \"" << descRel << "\"\n";
+		     
 	}
       }
     }
     sort(tempEntities.begin(), tempEntities.end());
     tempEntities.erase(unique(tempEntities.begin(), tempEntities.end()), tempEntities.end());
     std::vector <std::vector <std::string> >::iterator teIt;
+    int counter4 = 0;
     for (teIt = tempEntities.begin(); teIt != tempEntities.end(); teIt++) {
       std::vector<std::string> currentTemp = *teIt;
       relNodesOut << "\"" << currentTemp[0] << "\"" << "," << "\"" << currentTemp[0] << "\"" << ","
 		  << "\"" << currentTemp[1] << "\"" << "," << "Entity" << "\n";
+      std::stringstream ms;
+      ms << counter4;
+      counter4++;
+      std::string curE = "e" + ms.str();
+      
+      cypherOut << "CREATE (" << curE << ":Entity {id: \"" << currentTemp[0] << "\", description: \"" << currentTemp[1] << "\"})\n";
+
+      std::vector <std::vector <std::string> >::iterator rIt3;
+      std::vector <std::vector <std::string> >::iterator rIt4;
+      int counter5 = 0;
+      for (rIt3 = assignedRelationships.begin(); rIt3 != assignedRelationships.end(); rIt3++) {
+	for (rIt4 = relationships.begin(); rIt4 != relationships.end(); rIt4++) {
+	  if (*rIt3->begin() == *rIt4->begin()) {
+	    if (*(rIt4->begin() + 1) == currentTemp[0]) {
+	      std::stringstream ms2;
+	      ms2 << counter5;
+	      counter5++;
+	      std::string curRe = "rEt" + ms2.str();
+	      
+	      cypherOut << "WITH " << curE << "\n"
+			<< "MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
+			<< "MERGE (" << curE << ")-[:IS_SOURCE_IN]->(" << curRe << ")\n";
+	    } else if (*(rIt4->begin() + 3) == currentTemp[0]) {
+	      std::stringstream ms2;
+	      ms2 << counter5;
+	      counter5++;
+	      std::string curRe = "rEt" + ms2.str();
+	      
+	      cypherOut << "WITH " << curE << "\n"
+			<< "MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
+			<< "MERGE (" << curE << ")-[:IS_TARGET_IN]->(" << curRe << ")\n";
+	    }
+	  }
+	}
+      }
     }
+
+    cypherOut << "\n// End of block where relationships are created.\n\n";
+    
     relNodesOut.close();
     relEdgesOut.close();
     relIndNodesOut.close();
     relIndEdgesOut.close();
     relEntEdgesOut.close();
   }
+  
   if (entityAttributesBool == true) {
     fileName = "Entity_Attributes_Nodes.csv";
     filePath = path;
@@ -2382,8 +2494,11 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 
     eaNodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
     eaEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Value" << "," << "Label" << "\n";    
+
+    cypherOut << "// Start of block where entity relationships are created.\n\n";
     
     std::vector<std::vector <std::string> >::iterator aIt;
+    int counter = 0;
     for (aIt = assignedEntityAttributes.begin(); aIt != assignedEntityAttributes.end(); aIt++) {
       std::vector<std::string> currentAttribute = *aIt;
       std::vector<std::vector <std::string> >::iterator aIt2;
@@ -2395,7 +2510,17 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	}
       }
       eaNodesOut << currentAttribute[0] << "," << currentAttribute[0] << "," << "\"" << attDesc << "\"" << "," << "Attribute" << "\n";
+
+      std::stringstream ms;
+      ms << counter;
+      counter++;
+      std::string curA = "ea" + ms.str();
+      
+      cypherOut << "CREATE (" << curA << ":Entity_Attribute {id: \"" << currentAttribute[0]
+		<< "\", description: \"" << attDesc << "\"})\n";
+      
       std::vector<std::string>::iterator aIt3;
+      int counter2 = 0;
       for (aIt3 = currentAttribute.begin() + 1; aIt3 != currentAttribute.end(); aIt3++) {
 	std::string value = "";
 	std::vector <std::vector <std::string> >::iterator valIt;
@@ -2404,9 +2529,22 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	    value = *(valIt->begin() + 2);
 	  }
 	}
-	eaEdgesOut << currentAttribute[0] << "," << *aIt3 << "," << "Directed" << "," << value << "," << "IS_ATTRIBUTE_OF" <<  "\n";
+	eaEdgesOut << currentAttribute[0] << "," << *aIt3 << "," << "Directed" << ",\"" << value
+		   << "\"," << "IS_ATTRIBUTE_OF" <<  "\n";
+
+	std::stringstream ms2;
+	ms2 << counter2;
+	counter2++;
+	std::string curE = "enA" + ms2.str();
+	
+	cypherOut << "WITH " << curA << "\n"
+		  << "MATCH (" << curE << " {id: \"" << *aIt3 << "\"})\n"
+		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: \"" << value << "\"}]->(" << curE << ")\n";
       }
     }
+    
+    cypherOut << "\n // End of block where entity attributes are created.\n\n";
+    
     eaNodesOut.close();
     eaEdgesOut.close();
 
@@ -2478,31 +2616,63 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     
     ecNodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
     ecEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
+    cypherOut << "// Start of block where entity categories are created.\n\n";
 
     std::vector <std::vector <std::string> >::iterator ecIt;
-    for (ecIt = assignedEntityAttributeCategories.begin(); ecIt != assignedEntityAttributeCategories.end(); ecIt++) {
-      std::vector<std::string> currentCategory = *ecIt;
-      std::string catDesc;
-      std::vector<std::vector <std::string> >::iterator ecIt2;
-      for (ecIt2 = entityAttributeCategories.begin(); ecIt2 != entityAttributeCategories.end(); ecIt2++) {
-	std::vector<std::string> currentCat = *ecIt2;
-	if (currentCategory[0] == currentCat[0]) {
-	  catDesc = currentCat[1];
+    std::vector<std::vector <std::string> >::iterator ecIt2;
+    int counter = 0;
+    int counter2 = 0;
+    bool assigned = false;
+    for (ecIt = entityAttributeCategories.begin(); ecIt != entityAttributeCategories.end(); ecIt++) {
+      std::vector<std::string> currentCategory;
+      for (ecIt2 = assignedEntityAttributeCategories.begin(); ecIt2 != assignedEntityAttributeCategories.end(); ecIt2++) {
+	if (*ecIt->begin() == *ecIt2->begin()) {
+	  assigned = true;
+	  currentCategory = *ecIt2;
 	}
       }
-      std::vector<std::string>::iterator ecIt3;
-      for (ecIt3 = currentCategory.begin() + 1; ecIt3 != currentCategory.end(); ecIt3++) {
-	ecEdgesOut << *ecIt3 << "," << currentCategory[0] << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
+      if (assigned) {
+	ecNodesOut << *ecIt->begin() << "," << *ecIt->begin() << "," << "\"" << *(ecIt->begin() + 1)
+		   << "\"" << "," << "Category" << "\n";
+	
+	std::stringstream ms;
+	ms << counter;
+	counter++;
+	std::string curC = "eC" + ms.str();
+	
+	cypherOut << "CREATE (" << curC << ":Entity_Category {id: \"" << *ecIt->begin()
+		  << "\", description: \"" << *(ecIt->begin() + 1) << "\"})\n";
+
+	std::vector<std::string>::iterator ecIt3;
+	for (ecIt3 = currentCategory.begin() + 1; ecIt3 != currentCategory.end(); ecIt3++) {
+	  ecEdgesOut << *ecIt3 << "," << *ecIt->begin() << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
+	  
+	  std::stringstream ms2;
+	  ms2 << counter2;
+	  counter2++;
+	  std::string curA = "eCa" + ms2.str();
+	  
+	  cypherOut << "WITH " << curC << "\n"
+		    << "MATCH (" << curA << " {id: \"" << *ecIt3 << "\"})\n"
+		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC <<")\n";
+	  assigned = false;
+	}
       }
-      ecNodesOut << currentCategory[0] << "," << currentCategory[0] << "," << "\"" << catDesc << "\"" << "," << "Category" << "\n";
     }
+
+    cypherOut << "\n // End of block where entity categories are created.";
+    
     ecNodesOut.close();
     ecEdgesOut.close();
   }
+
+  cypherOut.close();
+  
   QPointer<QMessageBox> errorBox = new QMessageBox;
   errorBox->setText(tr("<b>Files exported</b>"));
   errorBox->setInformativeText("Your files have been exported to the \"../export\" folder in the program's directory.");
   errorBox->exec();
+
 }
 
 

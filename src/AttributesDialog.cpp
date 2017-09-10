@@ -241,7 +241,8 @@ void AttributesDialog::assignCategory() {
     bool foundAttribute = false;
     std::vector <std::vector <std::string> >::size_type categoryIndex;
     if (submittedType == INCIDENT) {
-      for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedIncidentAttributeCategories.size(); i++) {
+      for (std::vector <std::vector <std::string> >::size_type i = 0;
+	   i != dataInterface->assignedIncidentAttributeCategories.size(); i++) {
 	std::vector<std::string> currentGroup = dataInterface->assignedIncidentAttributeCategories[i];
 	if (currentGroup[0] == currentCategory.toStdString()) {
 	  foundCategory = true;
@@ -275,10 +276,11 @@ void AttributesDialog::assignCategory() {
       currentCategory = "";
       updateTexts();
     } else if (submittedType == ENTITY) {
-      for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedEntityAttributeCategories.size(); i++) {
+      for (std::vector <std::vector <std::string> >::size_type i = 0;
+	   i != dataInterface->assignedEntityAttributeCategories.size(); i++) {
 	std::vector<std::string> currentGroup = dataInterface->assignedEntityAttributeCategories[i];
 	if (currentGroup[0] == currentCategory.toStdString()) {
-	  foundCategory = false;
+	  foundCategory = true;
 	  categoryIndex = i;
 	  std::vector<std::string>::iterator pIt;
 	  for (pIt = currentGroup.begin() + 1; pIt != currentGroup.end(); pIt++) {

@@ -336,9 +336,10 @@ By default, the program will also export (1) all attributes that you have assign
 \item{\emph{If you select to \textbf{Export relationships}, then five additional files will be created}: \textbf{"Relationships\textunderscore Nodes.csv"}, a node list with the details (labels and memos) of all relationships that have been assigned to incidents, \textbf{"Incidents\textunderscore to\textunderscore Relationships\textunderscore Edges.csv"}, an edge list that records which incidents are indicators for which relationships, \textbf{"Entities\textunderscore Nodes.csv"}, a node list with the details (labels and descriptions) of all entities that are in one or more relationships, \textbf{"Entities\textunderscore Edges.csv"}, and edge list that records which entities are in which type of relationship with each other, and \textbf{"Entities\textunderscore to \textunderscore Relationships \textunderscore Edges.csv"}, an edge list that records which entities are present in which relationships.}
 \item{\emph{If you also select to \textbf{Include entity attributes}, then three additional files will be created}: \textbf{"Entity\textunderscore Attributes\textunderscore Nodes.csv"}, a node list with the details (labels and descriptions) of all attributes that have been assigned to entities, \textbf{"Entity\textunderscore Attributes\textunderscore to \textunderscore Entities\textunderscore Edges.csv"}, an edge list that records which attributes have been assigned to which entities (if values have been assigned, these will be recorded as well), and \textbf{"Entity\textunderscore Attributes\textunderscore Matrix.csv"}, a matrix with entities in the rows and attributes in the columns, showing a \(0\) in cells corresponding with entities and attributes that are not associated, and showing a \(1\) in cells corresponding with entities and attributes that have been associated. Alternatively, if a value has been assigned to an attribute, then that value will be reported in the cell, instead of a \(1\).}
 \item{\emph{If you also select to \textbf{Include entity categories}, then two additional files will be created}: \textbf{"Entity\textunderscore Categories\textunderscore Nodes.csv"}, a node list with the details (labels and descriptions) of all categories that have been assigned to entity attributes, and \textbf{"Entity\textunderscore Attributes\textunderscore to\textunderscore Categories\textunderscore \ Edges.csv"}, an edge list that records which entity attributes belong to which categories.}
+\item{Whatever options you select, the program will always export a file called \textbf{``Cypher.txt''} (although the contents of this file will depend on the selected export options). This file is a list of instructions that can be used to easily import the coded data into a Neo4j\footnote{See \url{https://neo4j.com/}.} graph database. See section \ref{sec:graphdatabases} for an explanation of why this is useful.}
 \end{enumerate}
 
-Thus, in total, up to 16 files will thus be exported. These files will all be automatically saved in the \textbf{``export/''} folder, which can be found in the folder from which you run the program (if the folder was not already present, a new folder will be created). \textbf{Every time you export data, existing files in this folder will be overwritten.} Thus, if you want to keep old files, make sure that you copy them to another folder before exporting data again.
+Thus, in total, up to 17 files will thus be exported. These files will all be automatically saved in the \textbf{``export/''} folder, which can be found in the folder from which you run the program (if the folder was not already present, a new folder will be created). \textbf{Every time you export data, existing files in this folder will be overwritten.} Thus, if you want to keep old files, make sure that you copy them to another folder before exporting data again.
 
 To understand more about what you could possibly do with all these files, please read chapter \ref{chap:whatisnext}.
 
@@ -648,46 +649,52 @@ And that covers all important things you need to know about the relationship mod
 \chapter{What is next?}
 \label{chap:whatisnext}
 
-So, you have coded a data set (see chapter \ref{chap:usingtheprogram2}), and you have exported your coded data (see section \ref{sec:exportingdata}), resulting in a bunch of files in the \textbf{``export/''} folder. What can we actually do with these files now? I think there are many possibilities, and I will not explore all of these here, but let me mention at least a few\footnote{If you have ideas that you would like to share, please contact me (see chapter \ref{chap:contactdetails})!}.
-
-\section{Graph databases}
-\label{sec:graphdatasets}
-
-Lately, I have been experimenting a lot with the use of graph databases, which are, in very simple terms, databases in which all data are either stored as \textbf{nodes}, as \textbf{relationships between nodes}, or as \textbf{properties} of nodes or relationships. For me, storing data this way is ideal, because I usually like to present event data in some ``networked form'', and with graph databases there are very few steps required between storing data and presenting data in such a form. As discussed in section \ref{sec:partofbiggerprogram}, I intend to integrate the \textbf{\emph{Event Coder}} program in a bigger program at some point. My intention is for this bigger program to interface directly with a graph database, without the user ever having to worry about how this works. For now, however, the data that the \textbf{\emph{Event Coder}} program exports have to be imported into a graph database manually. I will not offer a detailed example of how to do this here, because it is well beyond the scope of this manual\footnote{Read as: ``I really do not feel like working out such an example right now.''}.
-
-Figure \ref{fig:graphdatabaseexample} shows a screenshot of a some of our coded data after I have imported them into a Neo4j graph data base\footnote{See \url{https://neo4j.com/}.}. This screenshot gives a pretty good picture of the kind of data structures that I want the bigger program to eventually work with. Some of you may wonder why I do not simply use a tabular structure for our data. One good reason to use graph structures to structure your data is that it is relatively easy to convert complex graph structured data to tabular form, while doing the opposite becomes difficult as the complexity of the data increases. For example, say that I want to create a simple table of our entities and their attributes. This is can be achieved relatively easily (see figure \ref{fig:attributestable} for an example of such a table produced with Neo4j).
+So, you have coded a data set (see chapter \ref{chap:usingtheprogram2}), and you have exported your coded data (see section \ref{sec:exportingdata}), resulting in a bunch of files in the \textbf{``export/''} folder. What can we actually do with these files now? Most of the files are in the form of a node list or an edge list. This should allow you to import the data contained in them in network visualisation software. More specifically, the node and edge lists have been formatted such that they can be immediately imported into Gephi\footnote{See \url{https://gephi.org/}.}. One could import each set of nodes and edges into Gephi one after the other, and eventually recreate the entire data set as a network\footnote{There is an important limitation to Gephi, which is that parallel edges are not yet implemented, which severely limits the ability to capture different types of relationships that exist between the same entities. However, the developers are Gephi are looking to support parallel edges in a future version of the program.}, but in the below I describe a more useful and powerful way to achieve this. However, importing files into Gephi may still be useful if one wants to visualise specific aspects of the data, such as visualising which attributes were assigned to which incidents (see figure \ref{fig:network}). In this case one would import the \textbf{"Incidents\textunderscore Nodes.csv"} and \textbf{"Incident\textunderscore Attributes\textunderscore Nodes.csv"} files as node lists, and import the \textbf{"Incident\textunderscore Attributes\textunderscore to\textunderscore Incidents\textunderscore Edges.csv"} file as an edge list.
 
 \begin{figure}[h!]
   \centering
-  \caption{Some of our coded data stored in a graph database.}
-  \includegraphics[width=100mm]{Screenshot_23.pdf}
-  \label{fig:graphdatabaseexample}
-\end{figure}
-
-\begin{figure}[h!]
-  \centering
-  \caption{Our table of entities and their attributes.}
-  \includegraphics[width=80mm]{Screenshot_24.pdf}
-  \label{fig:attributestable}
-\end{figure}
-
-This does not actually tell you anything that you could do with these data in terms of analysis, but I hope it does make clear that it offers a lot of flexibility in how you store, present, and structure your data. Once you manage to put your data into a graph structure, it is easy to convert your data in the various forms required by different software packages.
-
-\section{Visualising relationships}
-\label{sec:visualisingrelationships}
-
-We do not actually have to first import our coded data into a graph database before we can make interesting visualisations. Some people may only be interested in creating an overview of which attributes are associated with which incidents, or an overview of all the relationships that are indicated by the incidents that we coded. Such overviews can be easily created with network visualisation software. I have mentioned several times that my favourite network visualisation tool is Gephi\footnote{See \url{https://gephi.org/}.}. I have therefore structured many of the exported files such that you can immediately import them into Gephi.
-
-The visualisation illustrated in figure \ref{fig:network} was created in a few minutes. I simply imported the file \textbf{``Entity\textunderscore Nodes.csv''} as a node list, and the file \textbf{"Entity\textunderscore Edges.csv"} as an edge list (importing is done from Gephi's data laboratory), created a simple layout with Gephi's Force Atlas 2 layout, changed the colour of the nodes, made sure that the labels of the edges show up, and then exported the result, after fine-tuning the visualisation in Gephi's preview window. 
-
-\begin{figure}[h!]
-  \centering
-  \caption{Visualising the relationships between entities.}
+  \caption{Visualising incidents and their attributes.}
   \includegraphics[width=80mm]{Diagram_5.pdf}
   \label{fig:network}
 \end{figure}
 
-You can use this procedure with most of the files that the \textbf{\emph{Event Coder}} program exports. Eventually, you could just reproduce the type of graphs that we saw in figure \ref{fig:graphdatabaseexample}, although Gephi was originally not intended to be used as a graph database\footnote{There is a plugin for Gephi that allows you to use Gephi as an interface for a Neo4j graph database. At the time I was writing this manual, this plugin was not yet updated for the latest version of Gephi.}.
+Creating such visual overviews may already help researchers in the further interpretation of their data (the fictional example shown in figure \ref{fig:network} is a bit unfortunate, because it does not engage with any interesting question). However, I believe a much more powerful way to work with the coded data is to use them to create a graph database. 
+
+\section{Graph databases}
+\label{sec:graphdatabases}
+
+At the time of writing this manual, I am experimenting with the use of graph databases, which are, in very simple terms, databases in which all data are either stored as \textbf{nodes}, as \textbf{relationships between nodes}, or as \textbf{properties} of nodes or relationships. For me, storing data this way is ideal, because I usually like to present event data in some ``networked form'', and with graph databases there are very few steps required between storing data and presenting data in such a form. As discussed in section \ref{sec:partofbiggerprogram}, I intend to integrate the \textbf{\emph{Event Coder}} program in a bigger program at some point. My intention is for this bigger program to interface directly with a graph database, without the user ever having to worry about how this works. For now, however, the user will need to use third-party solutions for creating such a graph database, and import the coded data into such a database manually.
+
+The graph database technology that I currently work with myself is the Neo4j Community Edition\footnote{See \url{https://neo4j.com/}.}, because (1) it is open source, which is something that I encourage, and (2) because it uses a query language and interface that I find very useful\footnote{I also see important drawbacks to Neo4j. In my opinion the configuration of Neo4j on your system, and the creation and management of new databases could have been made more intuitive. If you are completely new to Neo4j, it might take a while for you to get a solid grasp of how it works.}. I will not go into the details of how to use Neo4j here, because that would take me well beyond the scope of this manual. There is a wealth of information that can be found on the website of Neo4j\footnote{See, for example, \url{https://neo4j.com/docs/}.}, as well as on numerous other online forums. One of the files exported by the \emph{\textbf{Event Coder}} program (\textbf{"CYPHER.txt"} is a list of Cypher commands (Cypher is the language used by Neo4j) that the user can simply copy and paste into the Neo4j interface to recreate the complete, coded data set as a Neo4j database.    
+
+Figure \ref{fig:graphdatabaseexample} shows a screenshot of a Neo4j database that I created in this way, using some made-up data that I also used throughout the manual. In this screenshot, the larger red nodes represent incidents, the larger green nodes, represent relationships indicated by these incidents, the pink nodes represent entities in these relationships, the yellow nodes are attributes that have been assigned to incidents or entities, and so on. All information that we created when coding the data is represented in this graph as a node, a relationship, or a property of a node or relationship.
+
+\begin{figure}[h!]
+  \centering
+  \caption{A coded version of our fictional data set stored in a graph database.}
+  \includegraphics[width=100mm]{Screenshot_23.pdf}
+  \label{fig:graphdatabaseexample}
+\end{figure}
+
+So what can we do with these data now that we have put them in this graph format? Neo4j provides us with some powerful querying possibilities, allowing us to restructure them in various formats. For example, if we would like to create a table of all relationships between the entities in our database, we could use a query like the one shown in figure \ref{fig:entitiestable}.
+
+\begin{figure}[h!]
+  \centering
+  \caption{Query of relationships between entities.}
+  \includegraphics[width=100mm]{Screenshot_25.pdf}
+  \label{fig:entitiestable}
+\end{figure}
+
+Say that we want to make a node list (or just a table) of entities, and we also want to include attributes that belong to a certain category. An example of a query that would achieve something like that is shown in figure \ref{fig:attributestable}.
+
+\begin{figure}[h!]
+  \centering
+  \caption{Query of some entities and their attributes.}
+  \includegraphics[width=100mm]{Screenshot_24.pdf}
+  \label{fig:attributestable}
+\end{figure}
+
+There are many other possibilities with the Cypher query language. This does not actually tell you anything that you could do with these data in terms of analysis, but I hope it does make clear that it offers a lot of flexibility in how you store, present, and structure your data. Once you manage to put your data into a graph structure, it is easy to convert your data in the various forms required by different software packages.
 
 \section{Creating event graphs}
 \label{sec:creatingeventgraphs}

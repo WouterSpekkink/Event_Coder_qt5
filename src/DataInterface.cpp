@@ -2101,7 +2101,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 
   cypherOut << "// Here the incidents are created. Remove this block if they were already included.\n\n";
   
-  std::vector<std::string> cypherTemp; // NEW
+  std::vector<std::string> cypherTemp; 
   if (index.size() == 0) {
     fileOut << "Id" << "," << "Label" << "\n";
   } else {

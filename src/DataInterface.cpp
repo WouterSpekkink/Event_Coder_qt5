@@ -1814,6 +1814,80 @@ void DataInterface::importCodes(const QString &fileName) {
     we can translate the codes associated with the old file to the codes associated with
     the new file.
   */
+
+  // Let us check whether all rows are unique
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != rowData.size() - 1; i++) {
+    for (std::vector <std::vector <std::string> >::size_type j = i + 1; j != rowData.size(); j++) {
+      counter = 0;
+      for (std::vector<int>::size_type k = 0; k != indexOriginal.size(); k++) {
+	if (rowData[i][indexOriginal[k]] == rowData[j][indexOriginal[k]]) {
+	  counter++;
+	}
+      }
+      if (counter >= goal) {
+	memos.clear();
+	relationMemos.clear();
+	incidentAttributes.clear();
+	assignedIncidentAttributes.clear();
+	incidentAttributeCategories.clear();
+	assignedIncidentAttributeCategories.clear();
+	incidentValues.clear();
+	relationships.clear();
+	assignedRelationships.clear();
+	entities.clear();
+	entityAttributes.clear();
+	assignedEntityAttributes.clear();
+	entityValues.clear();
+	entityAttributeCategories.clear();
+	assignedEntityAttributeCategories.clear();
+	relationshipTypes.clear();
+
+	QPointer <QMessageBox> warningBox = new QMessageBox;
+	warningBox->addButton(QMessageBox::Ok);
+	warningBox->setIcon(QMessageBox::Warning);
+	warningBox->setText("WARNING: Identical entries detected in current data set with current selection of columns!");
+	warningBox->exec();
+	return;
+      }
+    }
+  }
+    
+  for (std::vector <std::vector <std::string> >::size_type i = 0; i != tempRowData.size() - 1; i++) {
+    for (std::vector <std::vector <std::string> >::size_type j = i + 1; j != tempRowData.size(); j++) {
+      counter = 0;
+      for (std::vector<int>::size_type k = 0; k != indexLoaded.size(); k++) {
+	if (tempRowData[i][indexLoaded[k]] == tempRowData[j][indexLoaded[k]]) {
+	  counter++;
+	}
+      }
+      if (counter == goal) {
+	memos.clear();
+	relationMemos.clear();
+	incidentAttributes.clear();
+	assignedIncidentAttributes.clear();
+	incidentAttributeCategories.clear();
+	assignedIncidentAttributeCategories.clear();
+	incidentValues.clear();
+	relationships.clear();
+	assignedRelationships.clear();
+	entities.clear();
+	entityAttributes.clear();
+	assignedEntityAttributes.clear();
+	entityValues.clear();
+	entityAttributeCategories.clear();
+	assignedEntityAttributeCategories.clear();
+	relationshipTypes.clear();
+      
+	QPointer <QMessageBox> warningBox = new QMessageBox;
+	warningBox->addButton(QMessageBox::Ok);
+	warningBox->setIcon(QMessageBox::Warning);
+	warningBox->setText("WARNING: Identical entries detected in loaded save file with current selection of columns!");
+	warningBox->exec();
+	return;
+      }
+    }
+  }
+  
   bool rowFound = false;
   std::vector <std::vector <std::string> > eventPairs;
   std::vector <std::vector <std::vector <std::string> >::size_type> removeCodes;

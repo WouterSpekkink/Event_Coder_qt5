@@ -6,9 +6,9 @@ The program was built in C++ and Qt5, so if you want to build the program from t
 
 Open a terminal and navigate to the folder with the source code. Then use the following commands.
 
-'''sh
+```sh
 qmake -project
 qmake -makefile
-'''
+```
 
 

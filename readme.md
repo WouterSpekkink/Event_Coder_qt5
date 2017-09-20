@@ -4,11 +4,16 @@ This is the code repository for the Event Coder program, which is a tool I built
 # Building the program from source
 The program was built in C++ and Qt5, so if you want to build the program from the source code yourself, you'll need to have the C++ standard libraries and the Qt5 libraries installed on your machine. If you have the proper libraries installed on your machine, the following process will allow you to build the program from source.
 
-Open a terminal and navigate to the folder with the source code. Then use the following commands.
+Open a terminal and navigate to the folder with the source code. Then use the following commands:
 
 ```sh
 qmake -project
 qmake -makefile
 ```
 
+One of the files that will be generated is a project file (*.pro). Open the file in a text editor, and add the following line somewhere near the top:
+
+```txt
+QT += widgets
+```
 

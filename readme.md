@@ -2,7 +2,7 @@
 This is the code repository for the Event Coder program, which is a tool I built to facilitate (part of) the qualitative coding of event data. I wrote the program for personal use, but anyone who's interested in the program or the code is free to use it. I therefore release the code under the GLP 3.0 license. 
 
 # Downloading Linux and Windows builds of the program
-I make Linux and Windows builds of the program available through my website. Go to www.wouterspekkink.org <http://www.wouterspekkink.org> and then to the **Software** page to find builds of the program.
+I make Linux and Windows builds of the program available through my website. Go to <http://www.wouterspekkink.org> and then to the **Software** page to find builds of the program.
 
 It should be possible to also build the program for Mac OSX, but I do not plan to do so myself (I do not have a Mac machine). Please see instructions below on how to build the program yourself. 
 

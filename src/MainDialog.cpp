@@ -709,7 +709,7 @@ void MainDialog::editMemo() {
   delete memoDialog;
   QDateTime time = QDateTime::currentDateTime();
   QString timeText = time.toString(Qt::TextDate);
-  QString newLog = timeText + " - " + "Edited memo for incident " + eventIndex + 1;
+  QString newLog = timeText + " - " + "Edited memo for incident " + QString::number(eventIndex + 1);
   logger->addToLog(newLog);
 }
 

@@ -86,6 +86,11 @@ private slots: // Still have to be defined.
   void nextFlagged();
   void jumpToIndex();
   void editMemo();
+
+  void jumpPreviousAttribute();
+  void jumpNextAttribute();
+  void jumpPreviousRelationship();
+  void jumpNextRelationship();
   
   void previousLeftEventField();
   void nextLeftEventField();
@@ -169,6 +174,10 @@ private:
   QPointer<QPushButton> newRelationshipButton;
   QPointer<QPushButton> editRelationshipButton;
   QPointer<QPushButton> removeRelationshipsButton;
+  QPointer<QPushButton> previousAssignedAttributeButton;
+  QPointer<QPushButton> nextAssignedAttributeButton;
+  QPointer<QPushButton> previousAssignedRelationshipButton;
+  QPointer<QPushButton> nextAssignedRelationshipButton;
   
   QPointer<QTextEdit> leftEventField;
   QPointer<QTextEdit> rightEventField;

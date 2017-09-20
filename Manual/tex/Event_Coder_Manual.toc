@@ -1,0 +1,47 @@
+\contentsline {chapter}{Contents}{1}{section*.1}
+\contentsline {chapter}{\chapternumberline {1}Introduction}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}The Event Coder program}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Part of a bigger program}{4}{section.1.2}
+\contentsline {section}{\numberline {1.3}Other disclaimers}{5}{section.1.3}
+\contentsline {chapter}{\chapternumberline {2}Preparations}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}It is all about the data}{7}{section.2.1}
+\contentsline {section}{\numberline {2.2}Data sets}{7}{section.2.2}
+\contentsline {subsection}{Other notes}{10}{section*.2}
+\contentsline {chapter}{\chapternumberline {3}Using the program: Basic features}{11}{chapter.3}
+\contentsline {section}{\numberline {3.1}Loading a new dataset}{11}{section.3.1}
+\contentsline {subsection}{Problems when importing data}{11}{section*.3}
+\contentsline {section}{\numberline {3.2}Saving and loading data}{13}{section.3.2}
+\contentsline {section}{\numberline {3.3}Importing existing codes}{13}{section.3.3}
+\contentsline {subsection}{Problems when importing codes}{15}{section*.4}
+\contentsline {section}{\numberline {3.4}Navigating through the data}{16}{section.3.4}
+\contentsline {subsection}{Marking incidents}{18}{section*.5}
+\contentsline {subsection}{Adding memos to incidents}{18}{section*.6}
+\contentsline {section}{\numberline {3.5}Filtering}{19}{section.3.5}
+\contentsline {section}{\numberline {3.6}Exporting data}{19}{section.3.6}
+\contentsline {section}{\numberline {3.7}Log files and exiting the program}{22}{section.3.7}
+\contentsline {chapter}{\chapternumberline {4}Using the program: Coding features}{23}{chapter.4}
+\contentsline {section}{\numberline {4.1}Introduction to coding}{23}{section.4.1}
+\contentsline {section}{\numberline {4.2}The attribute module}{23}{section.4.2}
+\contentsline {subsection}{Types of activity}{24}{section*.7}
+\contentsline {subsection}{Colligated events}{24}{section*.8}
+\contentsline {subsection}{Value changes}{25}{section*.9}
+\contentsline {subsection}{Creating new attributes}{26}{section*.10}
+\contentsline {subsection}{Editing attributes}{28}{section*.11}
+\contentsline {subsection}{Removing unused attributes}{28}{section*.12}
+\contentsline {subsection}{Incident attribute categories}{29}{section*.13}
+\contentsline {subsection}{Assigning and unassigning attributes}{30}{section*.14}
+\contentsline {subsection}{Navigating incidents based on attributes}{31}{section*.15}
+\contentsline {section}{\numberline {4.3}The relationship module}{32}{section.4.3}
+\contentsline {subsection}{Creating new relationships - part 1}{32}{section*.16}
+\contentsline {subsection}{Entities}{34}{section*.17}
+\contentsline {subsection}{Relationship types}{35}{section*.18}
+\contentsline {subsection}{Creating new relationships - part 2}{36}{section*.19}
+\contentsline {subsection}{Editing relationships}{37}{section*.20}
+\contentsline {subsection}{Removing relationships}{37}{section*.21}
+\contentsline {section}{\numberline {4.4}Assigning and unassigning relationships}{38}{section.4.4}
+\contentsline {subsection}{Navigating incidents based on relationships}{38}{section*.22}
+\contentsline {chapter}{\chapternumberline {5}What is next?}{41}{chapter.5}
+\contentsline {section}{\numberline {5.1}Graph databases}{41}{section.5.1}
+\contentsline {section}{\numberline {5.2}Creating event graphs}{44}{section.5.2}
+\contentsline {section}{\numberline {5.3}Future examples}{45}{section.5.3}
+\contentsline {chapter}{\chapternumberline {6}Contact details}{47}{chapter.6}

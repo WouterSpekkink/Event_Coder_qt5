@@ -120,6 +120,15 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   editAttributeButton = new QPushButton(tr("Edit highlighted attribute"));
   removeAttributesButton = new QPushButton(tr("Remove unused attributes"));
 
+  previousAssignedAttributeButton = new QPushButton(tr("Previous"));
+  previousAssignedAttributeButton->setEnabled(false);
+  nextAssignedAttributeButton = new QPushButton(tr("Next"));
+  nextAssignedAttributeButton->setEnabled(false);
+  previousAssignedRelationshipButton = new QPushButton(tr("Previous"));
+  previousAssignedRelationshipButton->setEnabled(false);
+  nextAssignedRelationshipButton = new QPushButton(tr("Next"));
+  nextAssignedRelationshipButton->setEnabled(false);
+
   eventRelationshipsLabel = new QLabel(tr("Indicated relationships:"));
   relationshipsPoolLabel = new QLabel(tr("Relationship pool:"));
   assignedRelationshipsListWidget = new QListWidget();
@@ -179,12 +188,16 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   connect(unassignedAttributesListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editAttribute()));
   connect(assignAttributeButton, SIGNAL(clicked()), this, SLOT(assignAttribute()));
   connect(unassignAttributeButton, SIGNAL(clicked()), this, SLOT(unassignAttribute()));
+  connect(previousAssignedAttributeButton, SIGNAL(clicked()), this, SLOT(jumpPreviousAttribute()));
+  connect(nextAssignedAttributeButton, SIGNAL(clicked()), this, SLOT(jumpNextAttribute()));
   connect(attributesFilterField, SIGNAL(textChanged(const QString &)), this, SLOT(filterAttributes(const QString &)));
   connect(assignedRelationshipsListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(setCurrentRelationship(QListWidgetItem*)));
   connect(unassignedRelationshipsListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(setCurrentRelationship(QListWidgetItem*)));
   connect(assignedRelationshipsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editRelationship()));
   connect(unassignedRelationshipsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editRelationship()));
   connect(assignRelationshipButton, SIGNAL(clicked()), this, SLOT(assignRelationship()));
+  connect(previousAssignedRelationshipButton, SIGNAL(clicked()), this, SLOT(jumpPreviousRelationship()));
+  connect(nextAssignedRelationshipButton, SIGNAL(clicked()), this, SLOT(jumpNextRelationship()));
   connect(unassignRelationshipButton, SIGNAL(clicked()), this, SLOT(unassignRelationship()));
   connect(relationshipsFilterField, SIGNAL(textChanged(const QString &)), this, SLOT(filterRelationships(const QString &)));
   connect(memoButton, SIGNAL(clicked()), this, SLOT(editMemo()));
@@ -289,6 +302,8 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   QPointer<QVBoxLayout> middleLeftAttributesLayout = new QVBoxLayout;
   middleLeftAttributesLayout->addWidget(assignAttributeButton);
   middleLeftAttributesLayout->addWidget(unassignAttributeButton);
+  middleLeftAttributesLayout->addWidget(previousAssignedAttributeButton);
+  middleLeftAttributesLayout->addWidget(nextAssignedAttributeButton);
   middleLeftAttributesLayout->setAlignment(Qt::AlignVCenter);
   attributesLayout->addLayout(middleLeftAttributesLayout);
   QPointer<QVBoxLayout> middleRightAttributesLayout = new QVBoxLayout;
@@ -321,6 +336,8 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   QPointer<QVBoxLayout> middleLeftRelationshipsLayout = new QVBoxLayout;
   middleLeftRelationshipsLayout->addWidget(assignRelationshipButton);
   middleLeftRelationshipsLayout->addWidget(unassignRelationshipButton);
+  middleLeftRelationshipsLayout->addWidget(previousAssignedRelationshipButton);
+  middleLeftRelationshipsLayout->addWidget(nextAssignedRelationshipButton);
   middleLeftRelationshipsLayout->setAlignment(Qt::AlignVCenter);
   relationshipsLayout->addLayout(middleLeftRelationshipsLayout);
   QPointer<QVBoxLayout> middleRightRelationshipsLayout = new QVBoxLayout;
@@ -885,6 +902,96 @@ void MainDialog::unassignAttribute() {
   }
 }
 
+void MainDialog::jumpPreviousAttribute() {
+  if (currentAttribute != "") {
+    std::vector <std::vector <std::string> >::iterator it;
+    std::vector<std::string> tempAttribute;
+    bool found = false;
+    for (it = dataInterface->assignedIncidentAttributes.begin(); it != dataInterface->assignedIncidentAttributes.end(); it++) {
+      if (*(it->begin()) == currentAttribute.toStdString()) {
+	found = true;
+	tempAttribute = *it;
+	break;
+      }
+    }
+    std::vector<std::string>::iterator it2;
+    std::vector <std::vector <std::string> >::size_type index = eventIndex;
+    bool changed = false;
+    if (found) {
+      for (it2 = tempAttribute.begin() + 1; it2 != tempAttribute.end(); it2++) {
+	std::vector <std::vector <std::string> >::size_type tempIndex;
+	std::istringstream ss(*it2);
+	ss >> tempIndex;
+	if (tempIndex < eventIndex && !changed) {
+	  index = tempIndex;
+	  changed = true;
+	} else if (tempIndex < eventIndex && changed) {
+	  if (tempIndex > index && tempIndex < eventIndex) {
+	    index = tempIndex;
+	  }
+	}
+      }
+      if (index < eventIndex) {
+	eventIndex = index;
+      }
+      disableAttributeSelection();
+      updateIndexIndicator();
+      updateTexts();
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "new index (as seen by user): " +
+	indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	QString::number(eventIndex);
+      logger->addToLog(newLog);
+    }
+  }
+}
+
+void MainDialog::jumpNextAttribute() {
+  if (currentAttribute != "") {
+    std::vector <std::vector <std::string> >::iterator it;
+    std::vector<std::string> tempAttribute;
+    bool found = false;
+    for (it = dataInterface->assignedIncidentAttributes.begin(); it != dataInterface->assignedIncidentAttributes.end(); it++) {
+      if (*(it->begin()) == currentAttribute.toStdString()) {
+	found = true;
+	tempAttribute = *it;
+	break;
+      }
+    }
+    std::vector<std::string>::iterator it2;
+    std::vector <std::vector <std::string> >::size_type index = eventIndex;
+    bool changed = false;
+    if (found) {
+      for (it2 = tempAttribute.begin() + 1; it2 != tempAttribute.end(); it2++) {
+	std::vector <std::vector <std::string> >::size_type tempIndex;
+	std::istringstream ss(*it2);
+	ss >> tempIndex;
+	if (tempIndex > eventIndex && !changed) {
+	  index = tempIndex;
+	  changed = true;
+	} else if (tempIndex > eventIndex && changed) {
+	  if (tempIndex < index && tempIndex > eventIndex) {
+	    index = tempIndex;
+	  }
+	}
+      }
+      if (index > eventIndex) {
+	eventIndex = index;
+      }
+      disableAttributeSelection();
+      updateIndexIndicator();
+      updateTexts();
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "new index (as seen by user): " +
+	indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	QString::number(eventIndex);
+      logger->addToLog(newLog);
+    }
+  }
+}
+
 void MainDialog::setValue(const QString &newValue) {
   if (currentAttribute != "") {
     std::string temp = newValue.toStdString();
@@ -1138,6 +1245,98 @@ void MainDialog::unassignRelationship() {
   }
 }
 
+
+void MainDialog::jumpPreviousRelationship() {
+  if (currentRelationship != "") {
+    std::vector <std::vector <std::string> >::iterator it;
+    std::vector<std::string> tempRelationship;
+    bool found = false;
+    for (it = dataInterface->assignedRelationships.begin(); it != dataInterface->assignedRelationships.end(); it++) {
+      if (*(it->begin()) == currentRelationship.toStdString()) {
+	found = true;
+	tempRelationship = *it;
+	break;
+      }
+    }
+    std::vector<std::string>::iterator it2;
+    std::vector <std::vector <std::string> >::size_type index = eventIndex;
+    bool changed = false;
+    if (found) {
+      for (it2 = tempRelationship.begin() + 1; it2 != tempRelationship.end(); it2++) {
+	std::vector <std::vector <std::string> >::size_type tempIndex;
+	std::istringstream ss(*it2);
+	ss >> tempIndex;
+	if (tempIndex < eventIndex && !changed) {
+	  index = tempIndex;
+	  changed = true;
+	} else if (tempIndex < eventIndex && changed) {
+	  if (tempIndex > index && tempIndex < eventIndex) {
+	    index = tempIndex;
+	  }
+	}
+      }
+      if (index < eventIndex) {
+	eventIndex = index;
+      }
+      disableAttributeSelection();
+      updateIndexIndicator();
+      updateTexts();
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "new index (as seen by user): " +
+	indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	QString::number(eventIndex);
+      logger->addToLog(newLog);
+    }
+  }
+}
+
+void MainDialog::jumpNextRelationship() {
+  if (currentRelationship != "") {
+    std::vector <std::vector <std::string> >::iterator it;
+    std::vector<std::string> tempRelationship;
+    bool found = false;
+    for (it = dataInterface->assignedRelationships.begin(); it != dataInterface->assignedRelationships.end(); it++) {
+      if (*(it->begin()) == currentRelationship.toStdString()) {
+	found = true;
+	tempRelationship = *it;
+	break;
+      }
+    }
+    std::vector<std::string>::iterator it2;
+    std::vector <std::vector <std::string> >::size_type index = eventIndex;
+    bool changed = false;
+    if (found) {
+      for (it2 = tempRelationship.begin() + 1; it2 != tempRelationship.end(); it2++) {
+	std::vector <std::vector <std::string> >::size_type tempIndex;
+	std::istringstream ss(*it2);
+	ss >> tempIndex;
+	if (tempIndex > eventIndex && !changed) {
+	  index = tempIndex;
+	  changed = true;
+	} else if (tempIndex > eventIndex && changed) {
+	  if (tempIndex < index && tempIndex > eventIndex) {
+	    index = tempIndex;
+	  }
+	}
+      }
+      if (index > eventIndex) {
+	eventIndex = index;
+      }
+      disableAttributeSelection();
+      updateIndexIndicator();
+      updateTexts();
+      QDateTime time = QDateTime::currentDateTime();
+      QString timeText = time.toString(Qt::TextDate);
+      QString newLog = timeText + " - " + "new index (as seen by user): " +
+	indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	QString::number(eventIndex);
+      logger->addToLog(newLog);
+    }
+  }
+}
+
+
 void MainDialog::addRelationship() {
   disableAttributeSelection();
   RelationsDialog *relationsDialog = new RelationsDialog(this, dataInterface, EMPTY, logger);
@@ -1199,14 +1398,18 @@ void MainDialog::filterRelationships(const QString &text) {
 }
 
 void MainDialog::setCurrentAttributeUnassigned(QListWidgetItem *item) {
+  disableAttributeSelection();
   currentAttribute = item->text();
   valueField->blockSignals(true);
   valueField->setText("");
   valueField->blockSignals(false);
   valueField->setEnabled(false);
+  previousAssignedAttributeButton->setEnabled(true);
+  nextAssignedAttributeButton->setEnabled(true);
 }
 
 void MainDialog::setCurrentAttributeAssigned(QListWidgetItem *item) {
+  disableAttributeSelection();
   currentAttribute = item->text();
   std::vector <std::vector <std::string> >::iterator it;
   valueField->setEnabled(true);
@@ -1214,6 +1417,8 @@ void MainDialog::setCurrentAttributeAssigned(QListWidgetItem *item) {
   valueField->blockSignals(true);
   valueField->setText(currentValue);
   valueField->blockSignals(false);
+  previousAssignedAttributeButton->setEnabled(true);
+  nextAssignedAttributeButton->setEnabled(true);
   for (it = dataInterface->incidentValues.begin(); it != dataInterface->incidentValues.end(); it++) {
     std::vector<std::string> currentGroup = *it;
     std::stringstream ss;
@@ -1229,13 +1434,16 @@ void MainDialog::setCurrentAttributeAssigned(QListWidgetItem *item) {
 }
 
 void MainDialog::setCurrentRelationship(QListWidgetItem *item) {
- currentRelationship = item->text();
- currentRelMemo = "";
- relMemoField->blockSignals(true);
- relMemoField->setText(currentRelMemo);
- relMemoField->blockSignals(false);
- std::vector <std::vector <std::string> >::iterator it;
- for (it = dataInterface->relationMemos.begin(); it != dataInterface->relationMemos.end(); it++) {
+  disableAttributeSelection();
+  currentRelationship = item->text();
+  currentRelMemo = "";
+  relMemoField->blockSignals(true);
+  relMemoField->setText(currentRelMemo);
+  relMemoField->blockSignals(false);
+  std::vector <std::vector <std::string> >::iterator it;
+  previousAssignedRelationshipButton->setEnabled(true);
+  nextAssignedRelationshipButton->setEnabled(true);
+  for (it = dataInterface->relationMemos.begin(); it != dataInterface->relationMemos.end(); it++) {
     std::vector<std::string> currentGroup = *it;
     if (currentGroup[0] == currentRelationship.toStdString()) {
       currentRelMemo = QString::fromStdString(currentGroup[1]);
@@ -1375,6 +1583,11 @@ void MainDialog::disableAttributeSelection() {
   valueField->blockSignals(true);
   valueField->setText(currentValue);
   valueField->blockSignals(false);
+  previousAssignedAttributeButton->setEnabled(false);
+  nextAssignedAttributeButton->setEnabled(false);
+  previousAssignedRelationshipButton->setEnabled(false);
+  nextAssignedRelationshipButton->setEnabled(false);
+
 }
 
 void MainDialog::setWorkButtons(const bool status) {

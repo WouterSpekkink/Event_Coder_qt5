@@ -265,7 +265,9 @@ Typically, you will want to assign codes to the incidents based on the informati
 
 Typically, you will create new codes on the fly (see chapter \ref{chap:usingtheprogram2}), assign appropriate codes to the current incident, and then move on to the next incident. Above the fields with the information on the current incident, you will see an indicator of which incident is currently selected (``\textbf{Incident ([current]/[total])}''). To navigate the incidents, use the buttons above the text fields (see figure \ref{fig:incidentsoverview}). These buttons are pretty straightforward. The \textbf{Previous incident} button navigates to the previous incident in the data set. If the currently selected incident is the first in the data set, clicking this button will let you jump to the last incident in the data set. The \textbf{Next incident} button lets you navigate to the next incident in the data set. If the currently selected incident is the last incident in the data set, clicking this button will let you jump to the first incident in the data set.
 
-You will also see a button called \textbf{Jump to}. Clicking this button will open a small dialog that allows you to type the index number of the incident that you want to jump to. If you type an 'illegal' number (e.g., a number below 1, or a number that exceeds that total number of incidents in the data set) nothing will happen. 
+You will also see a button called \textbf{Jump to}. Clicking this button will open a small dialog that allows you to type the index number of the incident that you want to jump to. If you type an 'illegal' number (e.g., a number below 1, or a number that exceeds that total number of incidents in the data set) nothing will happen.
+
+There are two other, special ways to navigate through your data, which only become available once you have coded your data. These are discussed in chapter \ref{chap:usingtheprogram2}. 
 
 \subsection{Marking incidents}
 \label{sec:markingincidents}
@@ -496,7 +498,20 @@ In this case, we have also done something else: we have added a value to the att
 
 If we decide that this value is not important after all, we could just select the attribute again, and delete the value that we entered.
 
-Unassigning attributes is achieved by clicking the attribute in the list of \textbf{Incident attributes}, and clicking the unassign button (\textbf{\guillemotright}). The attribute will move from the list of \textbf{Incident attributes} to the \textbf{Attribute pool}, and the attribute will no longer be associated with the current incident. Also, if a value was assigned to the attribute, this value will now have been removed. \textbf{This action is irreversible}. 
+Unassigning attributes is achieved by clicking the attribute in the list of \textbf{Incident attributes}, and clicking the unassign button (\textbf{\guillemotright}). The attribute will move from the list of \textbf{Incident attributes} to the \textbf{Attribute pool}, and the attribute will no longer be associated with the current incident. Also, if a value was assigned to the attribute, this value will now have been removed. \textbf{This action is irreversible}.
+
+\subsection{Navigating incidents based on attributes}
+\label{sec:navigatingattributes}
+
+Once you have started assigning attributes to incidents, it is also possible to jump between different incidents based on the attributes assigned to them. Once you click an attribute in the list of \textbf{Incident attributes} or in the \textbf{Attribute pool}, two additional buttons will be activated (see figure \ref{fig:navigatingattributes}), which allow you to jump to the previous or the next incident that has the currently selected attribute assigned to it. 
+
+\begin{figure}[h!]
+  \centering
+  \caption{Navigating incidents based on attributes.}
+  \includegraphics[width=100mm]{Screenshot_27.pdf}
+  \label{fig:navigatingattributes}
+\end{figure}
+
 
 And with this we have covered everything important that there is to know about the attribute module of the program!
 
@@ -634,6 +649,19 @@ The relationship memos thus are similar to attribute values. However, unlike att
 \end{figure}
 
 You can unassign a relationship by selecting it in the list of \textbf{Indicated relationships}, and then clicking the unassign button (\textbf{\guillemotright}). The relationship will move from the list of \textbf{Indicated relationships} to the \textbf{Relationship pool}, and the current incident will no longer serve as an indicator for this relationship. The memo that was assigned to the relationship will remain intact.
+
+\subsection{Navigating incidents based on relationships}
+\label{sec:navigatingrelationships}
+
+Once you have started assigning relationships to incidents, it is also possible to jump between different incidents based on the relationships assigned to them. Once you click a relationship in the list of \textbf{Indicated relationships} or in the \textbf{Relationship pool}, two additional buttons will be activated (see figure \ref{fig:navigatingrelationships}), which allow you to jump to the previous or the next incident that has the currently selected relationship assigned to it. 
+
+\begin{figure}[h!]
+  \centering
+  \caption{Navigating incidents based on relationships.}
+  \includegraphics[width=100mm]{Screenshot_28.pdf}
+  \label{fig:navigatingrelationships}
+\end{figure}
+
 
 And that covers all important things you need to know about the relationship module. We have now covered everything you need to know about using the \textbf{\emph{Event Coder}} program itself. In the next chapter I discuss a few things that you could potentially do with the data that you have coded. 
 

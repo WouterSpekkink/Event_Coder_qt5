@@ -659,7 +659,7 @@ bool EntityDialog::eventFilter(QObject *target, QEvent *event) {
   if (target == valueField || target == nameField || target == descriptionField) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar) {
+      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
 	return true;
       }
     }

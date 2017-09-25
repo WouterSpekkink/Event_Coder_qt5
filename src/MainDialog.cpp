@@ -718,10 +718,12 @@ void MainDialog::editMemo() {
       dataInterface->memos.erase(dataInterface->memos.begin() + memoIndex);
     }
   } else {
-    std::vector<std::string> tempMemo;
-    tempMemo.push_back(indexString);
-    tempMemo.push_back(memoText);
-    dataInterface->memos.push_back(tempMemo);
+    if (memoText != "") {
+      std::vector<std::string> tempMemo;
+      tempMemo.push_back(indexString);
+      tempMemo.push_back(memoText);
+      dataInterface->memos.push_back(tempMemo);
+    }
   }
   delete memoDialog;
   QDateTime time = QDateTime::currentDateTime();

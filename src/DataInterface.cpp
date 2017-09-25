@@ -2177,9 +2177,9 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
   
   std::vector<std::string> cypherTemp; 
   if (index.size() == 0) {
-    fileOut << "Id" << "," << "Label" << "\n";
+    fileOut << "Id" << "," << "Label" << "," << "Memo" << "\n";
   } else {
-    fileOut << "Id" << "," << "Label" << ",";
+    fileOut << "Id" << "," << "Label" << "," << "Memo" << ",";
     std::vector<std::string>::iterator it;
     for (it = exportProperties.begin(); it != exportProperties.end(); it++) {
       if (it != exportProperties.end() - 1) {
@@ -2194,16 +2194,25 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
   int counter = 1;
   std::vector <std::vector <std::string> >::iterator dIt;
   for (dIt = rowData.begin(); dIt != rowData.end(); dIt++) {
+    std::vector <std::vector <std::string> >::iterator memIt;
+    std::string currentMemo = "";
+    std::stringstream es;
+    es << counter - 1;
+    for (memIt = memos.begin(); memIt != memos.end(); memIt++) {
+      if (*memIt->begin() == es.str()) {
+	currentMemo = *(memIt->begin() + 1);
+      }
+    }
     std::vector<std::string> currentRow = *dIt;
     std::stringstream ss;
     ss << counter;
     std::string curI = "I" + ss.str();
     if (index.size() == 0) {
-      fileOut << counter << "," << counter << "," << "\n";
-      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << "})\n";
+      fileOut << counter << "," << counter << ",\"" << currentMemo << "\"\n";
+      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << "\"})\n";
     } else {
-      fileOut << counter << "," << counter << ",";
-      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", ";
+      fileOut << counter << "," << counter << ",\"" << currentMemo << "\",";
+      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << ", ";
       for (std::vector<std::vector<std::string>::size_type>::size_type i = 0;i != index.size(); i++) {
 	if (i != index.size() - 1) {
 	  fileOut << "\"" << currentRow[index[i]] << "\"" << ",";

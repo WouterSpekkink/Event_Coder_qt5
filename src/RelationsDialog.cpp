@@ -638,8 +638,7 @@ void RelationsDialog::saveAndClose() {
 	warningBox->exec();
 	return;
       }
-      if (dataInterface->relationships[i][0] == altLabel &&
-	  currentDirectedness == UNDIRECTED) {
+      if (dataInterface->relationships[i][0] == altLabel && currentDirectedness == UNDIRECTED) {
 	QPointer <QMessageBox> warningBox = new QMessageBox;
 	warningBox->addButton(QMessageBox::Ok);
 	warningBox->setIcon(QMessageBox::Warning);
@@ -677,14 +676,17 @@ void RelationsDialog::saveAndClose() {
 	dataInterface->relationships[i][1] = selectedSourceLabel->text().toStdString();
 	dataInterface->relationships[i][2] = selectedTypeLabel->text().toStdString();
 	dataInterface->relationships[i][3] = selectedTargetLabel->text().toStdString();
-	QDateTime time = QDateTime::currentDateTime();
+ 	QDateTime time = QDateTime::currentDateTime();
 	QString timeText = time.toString(Qt::TextDate);
 	QString newLog = timeText + " - " + "Edited relationship " + submittedLabel +
 	  ", which is now saved as " + QString::fromStdString(label);
 	logger->addToLog(newLog);
-
 	createNew = false;
-	this->close();
+      }
+    }
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedRelationships.size(); i++) {
+      if (dataInterface->assignedRelationships[i][0] == permanentLabel.toStdString() && submittedLabel != EMPTY) {
+	dataInterface->assignedRelationships[i][0] = label;
       }
     }
     if (createNew) {
@@ -693,6 +695,8 @@ void RelationsDialog::saveAndClose() {
       QString newLog = timeText + " - " + "Created new relationship " + QString::fromStdString(label);
       logger->addToLog(newLog);
       dataInterface->relationships.push_back(tempRelationship);
+      this->close();
+    } else {
       this->close();
     }
   } else if (selectedSourceLabel->text() == DEFAULT || selectedTypeLabel->text() == DEFAULT || selectedTargetLabel->text() == DEFAULT) {

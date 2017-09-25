@@ -2212,7 +2212,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << "\"})\n";
     } else {
       fileOut << counter << "," << counter << ",\"" << currentMemo << "\",";
-      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << ", ";
+      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << "\", ";
       for (std::vector<std::vector<std::string>::size_type>::size_type i = 0;i != index.size(); i++) {
 	if (i != index.size() - 1) {
 	  fileOut << "\"" << currentRow[index[i]] << "\"" << ",";

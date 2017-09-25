@@ -26,7 +26,7 @@
 
 /*
   ===NOTES===
-  A very basic dialog to store a memo for the current event.
+  A very basic dialog to store a memo for the current incident.
 
 */
 
@@ -37,7 +37,7 @@ MemoDialog::MemoDialog(QWidget *parent, std::vector<std::vector <std::string> >:
   // Entities
   memo = QString::fromStdString(currentMemo);
   eventIndex = index + 1;
-  memoLabel = new QLabel("Memo for event " + QString::number(eventIndex) + ":");
+  memoLabel = new QLabel("Memo for incident " + QString::number(eventIndex) + ":");
   memoField = new QTextEdit;
   memoField->installEventFilter(this);
 

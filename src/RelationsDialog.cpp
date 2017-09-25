@@ -689,6 +689,11 @@ void RelationsDialog::saveAndClose() {
 	dataInterface->assignedRelationships[i][0] = label;
       }
     }
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->relationMemos.size(); i++) {
+      if (dataInterface->relationMemos[i][0] == permanentLabel.toStdString() && submittedLabel  != EMPTY) {
+	dataInterface->relationMemos[i][0] = label;
+      }
+    }
     if (createNew) {
       QDateTime time = QDateTime::currentDateTime();
       QString timeText = time.toString(Qt::TextDate);

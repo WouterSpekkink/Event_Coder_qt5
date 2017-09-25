@@ -1475,7 +1475,7 @@ void DataInterface::importCodes(const QString &fileName) {
       }
     case relationMemosField:
       {
-	if (buffer != MEMOS_BEGIN && buffer != MEMOS_END) {
+	if (buffer != RELATIONMEMOS_BEGIN && buffer != RELATIONMEMOS_END) {
 	  std::istringstream stringStream(buffer);
 	  while (stringStream) {
 	    std::vector<std::string> tempMemo;

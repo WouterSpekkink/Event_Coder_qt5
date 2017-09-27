@@ -82,7 +82,9 @@ EntityDialog::EntityDialog(QWidget *parent, DataInterface *interface, const QStr
   entityAttributesLabel = new QLabel(tr("Entity Attributes:"));
   attributesPoolLabel = new QLabel(tr("Attribute pool:"));
   entityAttributesListWidget = new QListWidget();
+  entityAttributesListWidget->setSortingEnabled(true);
   attributesPoolListWidget = new QListWidget();
+  attributesPoolListWidget->setSortingEnabled(true);
   assignAttributeButton = new QPushButton("<<");
   unassignAttributeButton = new QPushButton(">>");
   attributesFilterLabel = new QLabel(tr("Filter:"));

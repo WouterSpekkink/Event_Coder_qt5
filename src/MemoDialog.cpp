@@ -38,10 +38,10 @@ MemoDialog::MemoDialog(QWidget *parent, std::vector<std::vector <std::string> >:
   memo = QString::fromStdString(currentMemo);
   eventIndex = index + 1;
   memoLabel = new QLabel("Memo for incident " + QString::number(eventIndex) + ":");
-  memoField = new QTextEdit;
+  memoField = new QPlainTextEdit;
   memoField->installEventFilter(this);
 
-  memoField->setText(QString::fromStdString(currentMemo));
+  memoField->setPlainText(QString::fromStdString(currentMemo));
   memoField->installEventFilter(this);
   saveCloseButton = new QPushButton("Save and close");
   

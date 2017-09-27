@@ -31,12 +31,14 @@
 */
 
 #include "../include/IndexDialog.h"
+#include <QIntValidator>
 
-IndexDialog::IndexDialog(QWidget *parent) : QDialog(parent) {
+IndexDialog::IndexDialog(QWidget *parent, std::vector <std::vector <std::string> >::size_type max) : QDialog(parent) {
   // First we construct our dialog's entities.
-  indexLabel = new QLabel(tr("Event index:"));
+  indexLabel = new QLabel(tr("Incident index:"));
   indexText = "";
   indexField = new QLineEdit();
+  indexField->setValidator(new QIntValidator(1, max, this)); 
   goButton = new QPushButton(tr("Go"));
   goButton->setEnabled(false); // We only activate this button if there is something in the fields.
   cancelButton = new QPushButton(tr("Cancel"));
@@ -68,6 +70,7 @@ IndexDialog::IndexDialog(QWidget *parent) : QDialog(parent) {
 
 void IndexDialog::setIndexText(const QString newIndex) {
   indexText = newIndex.toStdString();
+  indexText.erase(indexText.find_last_not_of(" \n\r\t")+1);
   // Let us immediately check if we should active the go Button.
   if (indexText != "") {
     goButton->setEnabled(true); 

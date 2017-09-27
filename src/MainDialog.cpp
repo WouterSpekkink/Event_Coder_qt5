@@ -59,6 +59,8 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   currentValue = "";
   currentRelMemo = "";
   currentRelationshipFilter = "";
+  currentLeftEventFilter = "";
+  currentRightEventFilter = "";
   
   importFileLabel = new QLabel(tr("<h3>Import new data</h3>"));
   importFileLabel->setAlignment(Qt::AlignHCenter);
@@ -89,9 +91,9 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   jumpToButton = new QPushButton(tr("Jump to"));
   flagButton = new QPushButton(tr("Toggle flag"));
   memoButton = new QPushButton(tr("Add / Edit memo"));
-  leftEventField = new QTextEdit();
+  leftEventField = new QPlainTextEdit();
   leftEventField->setReadOnly(true);
-  rightEventField = new QTextEdit();
+  rightEventField = new QPlainTextEdit();
   rightEventField->setReadOnly(true);
   previousLeftEventFieldButton = new QPushButton("<");
   nextLeftEventFieldButton = new QPushButton(">");
@@ -102,6 +104,13 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   selectRightEventComboBox = new QComboBox();
   selectRightEventComboBox->addItem("                                                  ");
 
+  leftEventFilterField = new QLineEdit();
+  previousLeftEventFilterButton = new QPushButton("Prev.");
+  nextLeftEventFilterButton = new QPushButton("Next");
+  rightEventFilterField = new QLineEdit();
+  previousRightEventFilterButton = new QPushButton("Prev.");
+  nextRightEventFilterButton = new QPushButton("Next");
+  
   eventAttributesLabel = new QLabel(tr("Incident attributes:"));
   valueLabel = new QLabel(tr("Value:"));
   valueField = new QLineEdit();
@@ -165,6 +174,14 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   connect(importFileButton, SIGNAL(clicked()), this, SLOT(readNewData()));
   connect(previousEventButton, SIGNAL(clicked()), this, SLOT(previousEvent()));
   connect(nextEventButton, SIGNAL(clicked()), this, SLOT(nextEvent()));
+
+  connect(leftEventFilterField, SIGNAL(textChanged(const QString &)), this, SLOT(setLeftEventFilter(const QString &)));
+  connect(previousLeftEventFilterButton, SIGNAL(clicked()), this, SLOT(previousLeftEventFiltered()));
+  connect(nextLeftEventFilterButton, SIGNAL(clicked()), this, SLOT(nextLeftEventFiltered()));
+  connect(rightEventFilterField, SIGNAL(textChanged(const QString &)), this, SLOT(setRightEventFilter(const QString &)));
+  connect(previousRightEventFilterButton, SIGNAL(clicked()), this, SLOT(previousRightEventFiltered()));
+  connect(nextRightEventFilterButton, SIGNAL(clicked()), this, SLOT(nextRightEventFiltered()));
+  
   connect(selectLeftEventComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setLeftEventField(const QString &)));
   connect(selectRightEventComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setRightEventField(const QString &)));
   connect(previousLeftEventFieldButton, SIGNAL(clicked()), this, SLOT(previousLeftEventField()));
@@ -235,13 +252,26 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   topLine->setFrameShape(QFrame::HLine);
   mainLayout->addWidget(topLine);
 
+  QPointer<QFrame> vertLeftLine = new QFrame();
+  vertLeftLine->setFrameShape(QFrame::VLine);
+  QPointer<QFrame> vertRightLine = new QFrame();
+  vertRightLine->setFrameShape(QFrame::VLine);
+
   QPointer<QVBoxLayout> eventLayout = new QVBoxLayout;
   QPointer<QHBoxLayout> topEventLayout = new QHBoxLayout;
-  QPointer<QHBoxLayout> leftTopEventLayout = new QHBoxLayout;
-  leftTopEventLayout->addWidget(previousEventButton);
-  leftTopEventLayout->addWidget(previousFlaggedButton);
-  leftTopEventLayout->setAlignment(Qt::AlignHCenter);
+  QPointer<QVBoxLayout> leftTopEventLayout = new QVBoxLayout;
+  QPointer<QHBoxLayout> topLeftTopEventLayout = new QHBoxLayout;
+  topLeftTopEventLayout->addWidget(previousEventButton);
+  topLeftTopEventLayout->addWidget(previousFlaggedButton);
+  topLeftTopEventLayout->setAlignment(Qt::AlignHCenter);
+  leftTopEventLayout->addLayout(topLeftTopEventLayout);
+  QPointer<QHBoxLayout> bottomLeftTopEventLayout = new QHBoxLayout;
+  bottomLeftTopEventLayout->addWidget(previousLeftEventFilterButton);
+  bottomLeftTopEventLayout->addWidget(leftEventFilterField);
+  bottomLeftTopEventLayout->addWidget(nextLeftEventFilterButton);
+  leftTopEventLayout->addLayout(bottomLeftTopEventLayout);
   topEventLayout->addLayout(leftTopEventLayout);
+  topEventLayout->addWidget(vertLeftLine);
   QPointer<QVBoxLayout> indexIndicatorLayout = new QVBoxLayout;
   QPointer<QHBoxLayout> topIndexIndicatorLayout = new QHBoxLayout;
   topIndexIndicatorLayout->addWidget(indexIndicatorLabel);
@@ -256,10 +286,18 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent) {
   indexIndicatorLayout->addLayout(indexButtonsLayout);
   indexIndicatorLayout->setAlignment(Qt::AlignHCenter);
   topEventLayout->addLayout(indexIndicatorLayout);
-  QPointer<QHBoxLayout> rightTopEventLayout = new QHBoxLayout;
-  rightTopEventLayout->addWidget(nextFlaggedButton);
-  rightTopEventLayout->addWidget(nextEventButton);
-  rightTopEventLayout->setAlignment(Qt::AlignHCenter);
+  topEventLayout->addWidget(vertRightLine);
+  QPointer<QVBoxLayout> rightTopEventLayout = new QVBoxLayout;
+  QPointer<QHBoxLayout> topRightTopEventLayout = new QHBoxLayout;
+  topRightTopEventLayout->addWidget(nextFlaggedButton);
+  topRightTopEventLayout->addWidget(nextEventButton);
+  topRightTopEventLayout->setAlignment(Qt::AlignHCenter);
+  rightTopEventLayout->addLayout(topRightTopEventLayout);
+  QPointer<QHBoxLayout> bottomRightTopEventLayout = new QHBoxLayout;
+  bottomRightTopEventLayout->addWidget(previousRightEventFilterButton);
+  bottomRightTopEventLayout->addWidget(rightEventFilterField);
+  bottomRightTopEventLayout->addWidget(nextRightEventFilterButton);
+  rightTopEventLayout->addLayout(bottomRightTopEventLayout);
   topEventLayout->addLayout(rightTopEventLayout);
   eventLayout->addLayout(topEventLayout);
   QPointer<QHBoxLayout> middleEventLayout = new QHBoxLayout;
@@ -524,13 +562,30 @@ void MainDialog::processLoad(const QString &index, const QString &separator) {
   rightFieldIndex = 0;
   sep = separator;
   currentAttribute = "";
+  currentAttributeFilter = "";
+  attributesFilterField->blockSignals(true);
+  attributesFilterField->setText("");
+  attributesFilterField->blockSignals(false);
+  currentRelationshipFilter = "";
+  relationshipsFilterField->blockSignals(true);
+  relationshipsFilterField->setText("");
+  relationshipsFilterField->blockSignals(false);
+  currentLeftEventFilter = "";
+  leftEventFilterField->blockSignals(true);
+  leftEventFilterField->setText("");
+  leftEventFilterField->blockSignals(false);
+  currentRightEventFilter = "";  
+  rightEventFilterField->blockSignals(true);
+  rightEventFilterField->setText("");
+  rightEventFilterField->blockSignals(false);
+  
   valueField->blockSignals(true);
   valueField->setText("");
   valueField->blockSignals(false);
   valueField->setEnabled(false);
   relMemoField->blockSignals(true);
   relMemoField->setText("");
-  relMemoField->blockSignals(false);
+  relMemoField->blockSignals(false);  
   
   setWorkButtons(true);
   selectSeparatorComboBox->setEnabled(false);
@@ -669,7 +724,7 @@ void MainDialog::nextFlagged() {
 
 void MainDialog::jumpToIndex() {
   disableAttributeSelection();
-  IndexDialog *indexer = new IndexDialog(this);
+  IndexDialog *indexer = new IndexDialog(this, dataInterface->rowData.size());
   indexer->deleteLater();
   indexer->exec();
   std::string selectedIndex = indexer->getIndexText();
@@ -730,6 +785,142 @@ void MainDialog::editMemo() {
   QString timeText = time.toString(Qt::TextDate);
   QString newLog = timeText + " - " + "Edited memo for incident " + QString::number(eventIndex + 1);
   logger->addToLog(newLog);
+}
+
+void MainDialog::setLeftEventFilter(const QString &text) {
+  currentLeftEventFilter = text;
+}
+
+void MainDialog::previousLeftEventFiltered() {
+  disableAttributeSelection();
+  if (currentLeftEventFilter != "") {
+    QDateTime time = QDateTime::currentDateTime();
+    QString timeText = time.toString(Qt::TextDate);
+    QString newLog = timeText + " - " + "attempting to jump to previous incident with string \"" +
+      currentLeftEventFilter + "\" in column \"" +
+      QString::fromStdString(dataInterface->header[leftFieldIndex]) + "\"";
+    logger->addToLog(newLog);
+    std::vector <std::vector <std::string> >::size_type index;
+    bool cont = true;
+    for (index = eventIndex; cont == true; index--) {
+      if (index != eventIndex) {
+	std::size_t found = (dataInterface->rowData[index][leftFieldIndex]).find(currentLeftEventFilter.toStdString());
+	if (found != std::string::npos) {
+	  eventIndex = index;
+	  updateTexts();
+	  updateIndexIndicator();
+	  QDateTime time = QDateTime::currentDateTime();
+	  QString timeText = time.toString(Qt::TextDate);
+	  QString newLog = timeText + " - " + "new index (as seen by user): " +
+	    indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	    QString::number(eventIndex);
+	  logger->addToLog(newLog);
+	  return;
+	}
+      }
+      if (index == 0) {
+	cont = false;
+      }
+    }
+  }
+}
+
+void MainDialog::nextLeftEventFiltered() {
+  disableAttributeSelection();
+  if (currentLeftEventFilter != "") {
+    QDateTime time = QDateTime::currentDateTime();
+    QString timeText = time.toString(Qt::TextDate);
+    QString newLog = timeText + " - " + "attempting to jump to next incident with string \"" +
+      currentLeftEventFilter + "\" in column \"" +
+      QString::fromStdString(dataInterface->header[leftFieldIndex]) + "\"";
+    logger->addToLog(newLog);
+    std::vector <std::vector <std::string> >::size_type index;
+    for (index = eventIndex; index != dataInterface->rowData.size() ; index++) {
+      if (index != eventIndex) {
+	std::size_t found = (dataInterface->rowData[index][leftFieldIndex]).find(currentLeftEventFilter.toStdString());
+	if (found != std::string::npos) {
+	  eventIndex = index;
+	  updateTexts();
+	  updateIndexIndicator();
+	  QDateTime time = QDateTime::currentDateTime();
+	  QString timeText = time.toString(Qt::TextDate);
+	  QString newLog = timeText + " - " + "new index (as seen by user): " +
+	    indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	    QString::number(eventIndex);
+	  logger->addToLog(newLog);
+	  return;
+	}
+      }
+    }
+  }
+}
+
+void MainDialog::setRightEventFilter(const QString &text) {
+  currentRightEventFilter = text;
+}
+
+void MainDialog::previousRightEventFiltered() {
+  disableAttributeSelection();
+  if (currentRightEventFilter != "") {
+    QDateTime time = QDateTime::currentDateTime();
+    QString timeText = time.toString(Qt::TextDate);
+    QString newLog = timeText + " - " + "attempting to jump to previous incident with string \"" +
+      currentRightEventFilter + "\" in column \"" +
+      QString::fromStdString(dataInterface->header[rightFieldIndex]) + "\"";
+    logger->addToLog(newLog);
+    std::vector <std::vector <std::string> >::size_type index;
+    bool cont = true;
+    for (index = eventIndex; cont == true; index--) {
+      if (index != eventIndex) {
+	std::size_t found = (dataInterface->rowData[index][rightFieldIndex]).find(currentRightEventFilter.toStdString());
+	if (found != std::string::npos) {
+	  eventIndex = index;
+	  updateTexts();
+	  updateIndexIndicator();
+	  QDateTime time = QDateTime::currentDateTime();
+	  QString timeText = time.toString(Qt::TextDate);
+	  QString newLog = timeText + " - " + "new index (as seen by user): " +
+	    indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	    QString::number(eventIndex);
+	  logger->addToLog(newLog);
+	  return;
+	}
+      }
+      if (index == 0) {
+	cont = false;
+      }
+    }
+  }
+}
+
+void MainDialog::nextRightEventFiltered() {
+  disableAttributeSelection();
+  if (currentRightEventFilter != "") {
+    QDateTime time = QDateTime::currentDateTime();
+    QString timeText = time.toString(Qt::TextDate);
+    QString newLog = timeText + " - " + "attempting to jump to next incident with string \"" +
+      currentRightEventFilter + "\" in column \"" +
+      QString::fromStdString(dataInterface->header[rightFieldIndex]) + "\"";
+    logger->addToLog(newLog);
+    std::vector <std::vector <std::string> >::size_type index;
+    for (index = eventIndex; dataInterface->rowData.size(); index++) {
+      if (index != eventIndex) {
+	std::size_t found = (dataInterface->rowData[index][rightFieldIndex]).find(currentRightEventFilter.toStdString());
+	if (found != std::string::npos) {
+	  eventIndex = index;
+	  updateTexts();
+	  updateIndexIndicator();
+	  QDateTime time = QDateTime::currentDateTime();
+	  QString timeText = time.toString(Qt::TextDate);
+	  QString newLog = timeText + " - " + "new index (as seen by user): " +
+	    indexIndicatorLabel->text() + ", and new index (as stored in machine): " +
+	    QString::number(eventIndex);
+	  logger->addToLog(newLog);
+	  return;
+	}
+      }
+    }
+  }
 }
 
 void MainDialog::previousLeftEventField() {
@@ -1458,8 +1649,8 @@ void MainDialog::setCurrentRelationship(QListWidgetItem *item) {
 }
 
 void MainDialog::updateTexts() {
-  leftEventField->setText(QString::fromUtf8((dataInterface->rowData[eventIndex][leftFieldIndex]).c_str()));
-  rightEventField->setText(QString::fromUtf8((dataInterface->rowData[eventIndex][rightFieldIndex]).c_str()));
+  leftEventField->setPlainText(QString::fromUtf8((dataInterface->rowData[eventIndex][leftFieldIndex]).c_str()));
+  rightEventField->setPlainText(QString::fromUtf8((dataInterface->rowData[eventIndex][rightFieldIndex]).c_str()));
   selectLeftEventComboBox->setCurrentIndex(selectLeftEventComboBox->
 					   findText(QString::fromUtf8((dataInterface->header[leftFieldIndex]).c_str())));
   selectRightEventComboBox->setCurrentIndex(selectRightEventComboBox->
@@ -1589,7 +1780,6 @@ void MainDialog::disableAttributeSelection() {
   nextAssignedAttributeButton->setEnabled(false);
   previousAssignedRelationshipButton->setEnabled(false);
   nextAssignedRelationshipButton->setEnabled(false);
-
 }
 
 void MainDialog::setWorkButtons(const bool status) {
@@ -1621,6 +1811,14 @@ void MainDialog::setWorkButtons(const bool status) {
   attributesFilterField->setEnabled(status);
   relationshipsFilterField->setEnabled(status);
   exportDataButton->setEnabled(status);
+  previousLeftEventFilterButton->setEnabled(status);
+  nextLeftEventFilterButton->setEnabled(status);
+  previousRightEventFilterButton->setEnabled(status);
+  nextRightEventFilterButton->setEnabled(status);
+  relMemoField->setEnabled(status);
+  leftEventFilterField->setEnabled(status);
+  rightEventFilterField->setEnabled(status);
+  valueField->setEnabled(status);
 }
 
 void MainDialog::finalBusiness() {

@@ -87,10 +87,10 @@ AttributesDialog::AttributesDialog(QWidget *parent, DataInterface *interface,
   nameLabel = new QLabel(tr("Label:"));
   nameField = new QLineEdit();
   descriptionLabel = new QLabel(tr("Description:"));
-  descriptionField = new QTextEdit();
+  descriptionField = new QPlainTextEdit();
 
   nameField->setText(QString::fromStdString(name));
-  descriptionField->setText(QString::fromStdString(description));
+  descriptionField->setPlainText(QString::fromStdString(description));
   nameField->installEventFilter(this);
   descriptionField->installEventFilter(this);
    
@@ -660,8 +660,10 @@ void AttributesDialog::saveAndClose() {
   bool createNew = true;
   name.erase(std::remove(name.begin(), name.end(), ';'), name.end());
   name.erase(std::remove(name.begin(), name.end(), '|'), name.end());
+  name.erase(name.find_last_not_of(" \n\r\t")+1);
   description.erase(std::remove(description.begin(), description.end(), ';'), description.end());
   description.erase(std::remove(description.begin(), description.end(), '|'), description.end());
+  description.erase(description.find_last_not_of(" \n\r\t")+1);
   if (name != "" && description != "") {
     std::vector<std::string> tempAttribute;
     tempAttribute.push_back(name);

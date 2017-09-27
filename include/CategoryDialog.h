@@ -35,7 +35,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QTextEdit>
+#include <QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
@@ -74,7 +74,7 @@ private:
 
   QPointer<QLineEdit> nameField;
 
-  QPointer<QTextEdit> descriptionField;
+  QPointer<QPlainTextEdit> descriptionField;
 
   QString currentType;
   QString submittedLabel;

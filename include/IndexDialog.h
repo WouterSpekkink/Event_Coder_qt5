@@ -48,7 +48,7 @@ class IndexDialog : public QDialog {
   Q_OBJECT
 
 public:
-  IndexDialog(QWidget *parent = 0);
+  IndexDialog(QWidget *parent = 0, std::vector <std::vector <std::string> >::size_type max = 1);
   ~IndexDialog() {};
 
 private slots:

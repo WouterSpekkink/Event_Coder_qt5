@@ -324,8 +324,8 @@ void RelationsDialog::addEntity() {
 void RelationsDialog::editEntity() {
   if (lastSelectedEntity != "") {
     EntityDialog *entityDialog = new EntityDialog(this, dataInterface, lastSelectedEntity, logger);
-    disableAssign();
     entityDialog->exec();
+    disableAssign();
     delete entityDialog;
     updateTexts();
   }
@@ -334,8 +334,29 @@ void RelationsDialog::editEntity() {
 void RelationsDialog::editLeftAssignedEntity() {
   if (currentLeftEntitySelected != DEFAULT && currentLeftEntitySelected != EMPTY) {
     EntityDialog *entityDialog = new EntityDialog(this, dataInterface, currentLeftEntitySelected, logger);
+    entityDialog->deleteLater();
     disableAssign();
     entityDialog->exec();
+    std::string oName = entityDialog->getOldName();
+    std::string nName = entityDialog->getNewName();
+    if (oName != nName) {
+      if (currentLeftEntitySelected == QString::fromStdString(oName)) {
+	currentLeftEntitySelected = QString::fromStdString(nName);
+	selectedSourceLabel->setText(currentLeftEntitySelected);
+	if (submittedLabel != EMPTY) {
+	  std::string tail = "";
+	  std::string head = "]-->";
+	  if (currentDirectedness == DIRECTED) {
+	    tail = "---[";
+	  } else if (currentDirectedness == UNDIRECTED) {
+	    tail = "<--[";
+	  }
+	  std::string label = selectedSourceLabel->text().toStdString() + tail +
+	    selectedTypeLabel->text().toStdString() + head + selectedTargetLabel->text().toStdString();
+	  permanentLabel = QString::fromStdString(label);
+	}
+      }
+    }
     delete entityDialog;
     updateTexts();
   }
@@ -344,8 +365,29 @@ void RelationsDialog::editLeftAssignedEntity() {
 void RelationsDialog::editRightAssignedEntity() {
   if (currentRightEntitySelected != DEFAULT && currentRightEntitySelected != EMPTY) {
     EntityDialog *entityDialog = new EntityDialog(this, dataInterface, currentRightEntitySelected, logger);
+    entityDialog->deleteLater();
     disableAssign();
     entityDialog->exec();
+    std::string oName = entityDialog->getOldName();
+    std::string nName = entityDialog->getNewName();
+    if (oName != nName) {
+      if (currentRightEntitySelected == QString::fromStdString(oName)) {
+	currentRightEntitySelected = QString::fromStdString(nName);
+	selectedTargetLabel->setText(currentRightEntitySelected);
+	if (submittedLabel != EMPTY) {
+	  std::string tail = "";
+	  std::string head = "]-->";
+	  if (currentDirectedness == DIRECTED) {
+	    tail = "---[";
+	  } else if (currentDirectedness == UNDIRECTED) {
+	    tail = "<--[";
+	  }
+	  std::string label = selectedSourceLabel->text().toStdString() + tail +
+	    selectedTypeLabel->text().toStdString() + head + selectedTargetLabel->text().toStdString();
+	  permanentLabel = QString::fromStdString(label);
+	}
+      }
+    }
     delete entityDialog;
     updateTexts();
   }
@@ -442,8 +484,29 @@ void RelationsDialog::editRelType() {
 void RelationsDialog::editAssignedRelType() {
   if (currentRelTypeSelected != DEFAULT && currentRelTypeSelected != EMPTY) {
     RelTypeDialog *relTypeDialog = new RelTypeDialog(this, dataInterface, currentRelTypeSelected, logger);
+    relTypeDialog->deleteLater();
     disableAssign();
     relTypeDialog->exec();
+    std::string oName = relTypeDialog->getOldName();
+    std::string nName = relTypeDialog->getNewName();
+    if (oName != nName) {
+      if (currentRelTypeSelected == QString::fromStdString(oName)) {
+	currentRelTypeSelected = QString::fromStdString(nName);
+	selectedTypeLabel->setText(currentRelTypeSelected);
+	if (submittedLabel != EMPTY) {
+	  std::string tail = "";
+	  std::string head = "]-->";
+	  if (currentDirectedness == DIRECTED) {
+	    tail = "---[";
+	  } else if (currentDirectedness == UNDIRECTED) {
+	    tail = "<--[";
+	  }
+	  std::string label = selectedSourceLabel->text().toStdString() + tail +
+	    selectedTypeLabel->text().toStdString() + head + selectedTargetLabel->text().toStdString();
+	  permanentLabel = QString::fromStdString(label);
+	}
+      }
+    }
     delete relTypeDialog;
     updateTexts();
   }

@@ -31,7 +31,7 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QTextEdit>
+#include <QPlainTextEdit>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLineEdit>
@@ -54,7 +54,7 @@ class QLabel;
 class QListWidget;
 class QComboBox;
 class QLineEdit;
-class QTextEdit;
+class QPlainTextEdit;
 
 class MainDialog : public QDialog {
   Q_OBJECT
@@ -99,6 +99,13 @@ private slots: // Still have to be defined.
   void setLeftEventField(const QString &selection);
   void setRightEventField(const QString &selection);
 
+  void setLeftEventFilter(const QString &text);
+  void previousLeftEventFiltered();
+  void nextLeftEventFiltered();
+  void setRightEventFilter(const QString &text);
+  void previousRightEventFiltered();
+  void nextRightEventFiltered();
+  
   void assignAttribute();
   void unassignAttribute();
   void setValue(const QString &newValue);
@@ -119,7 +126,7 @@ private slots: // Still have to be defined.
   void setCurrentAttributeUnassigned(QListWidgetItem *item);
   void setCurrentAttributeAssigned(QListWidgetItem *item);
   void setCurrentRelationship(QListWidgetItem *item);
-
+  
   void updateIndexIndicator();
   void disableAttributeSelection();
   void updateTexts();
@@ -178,14 +185,20 @@ private:
   QPointer<QPushButton> nextAssignedAttributeButton;
   QPointer<QPushButton> previousAssignedRelationshipButton;
   QPointer<QPushButton> nextAssignedRelationshipButton;
+  QPointer<QPushButton> previousLeftEventFilterButton;
+  QPointer<QPushButton> nextLeftEventFilterButton;
+  QPointer<QPushButton> previousRightEventFilterButton;
+  QPointer<QPushButton> nextRightEventFilterButton;
   
-  QPointer<QTextEdit> leftEventField;
-  QPointer<QTextEdit> rightEventField;
+  QPointer<QPlainTextEdit> leftEventField;
+  QPointer<QPlainTextEdit> rightEventField;
 
   QPointer<QLineEdit> valueField;
   QPointer<QLineEdit> attributesFilterField;
   QPointer<QLineEdit> relationshipsFilterField;
   QPointer<QLineEdit> relMemoField;
+  QPointer<QLineEdit> leftEventFilterField;
+  QPointer<QLineEdit> rightEventFilterField;
 
   QPointer<QComboBox> selectSeparatorComboBox;
   QPointer<QComboBox> selectLeftEventComboBox;
@@ -204,6 +217,8 @@ private:
   QString currentRelMemo;
   QString currentRelationship;
   QString currentRelationshipFilter;
+  QString currentLeftEventFilter;
+  QString currentRightEventFilter;
   
   std::vector<std::vector <std::string> >::size_type eventIndex;
   std::vector<std::string>::size_type leftFieldIndex;

@@ -40,6 +40,7 @@
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QMessageBox>
+#include <QPlainTextEdit>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QDateTime>
@@ -100,7 +101,7 @@ private:
   QPointer<QLineEdit> nameField;
   QPointer<QLineEdit> categoriesFilterField;
 
-  QPointer<QTextEdit> descriptionField;
+  QPointer<QPlainTextEdit> descriptionField;
 
   QPointer<QListWidget> assignedCategoriesListWidget;
   QPointer<QListWidget> unassignedCategoriesListWidget;

@@ -67,14 +67,14 @@ EntityDialog::EntityDialog(QWidget *parent, DataInterface *interface, const QStr
   nameField = new QLineEdit();
 
   descriptionLabel = new QLabel(tr("Description:"));
-  descriptionField = new QTextEdit();
+  descriptionField = new QPlainTextEdit();
 
   valueLabel = new QLabel(tr("Value:"));
   valueField = new QLineEdit();
   valueField->setEnabled(false);
     
   nameField->setText(QString::fromStdString(name));
-  descriptionField->setText(QString::fromStdString(description));
+  descriptionField->setPlainText(QString::fromStdString(description));
   nameField->installEventFilter(this);
   descriptionField->installEventFilter(this);
   valueField->installEventFilter(this);
@@ -496,6 +496,14 @@ void EntityDialog::updateTexts() {
   }
 }
 
+std::string EntityDialog::getOldName() {
+  return permanentName;
+}
+
+std::string EntityDialog::getNewName() {
+  return name;
+}
+
 void EntityDialog::cancelAndClose() {
   disableAttributeSelection();
   if (submittedLabel == EMPTY) {
@@ -504,6 +512,7 @@ void EntityDialog::cancelAndClose() {
     QString newLog = timeText + " - " + "Cancelled adding new entity";
     logger->addToLog(newLog);
   } else {
+    name = permanentName;
     QDateTime time = QDateTime::currentDateTime();
     QString timeText = time.toString(Qt::TextDate);
     QString newLog = timeText + " - " + "Cancelled editing entity " + submittedLabel;
@@ -511,15 +520,17 @@ void EntityDialog::cancelAndClose() {
   }
   this->close();
 }
-
+  
 void EntityDialog::saveAndClose() {
   disableAttributeSelection();
   description = (descriptionField->toPlainText()).toStdString();
   bool createNew = true;
   name.erase(std::remove(name.begin(), name.end(), ';'), name.end());
   name.erase(std::remove(name.begin(), name.end(), '|'), name.end());
+  name.erase(name.find_last_not_of(" \n\r\t")+1);
   description.erase(std::remove(description.begin(), description.end(), ';'), description.end());
   description.erase(std::remove(description.begin(), description.end(), '|'), description.end());
+  description.erase(description.find_last_not_of(" \n\r\t")+1);
   if (name != "" && description != "") {
     std::vector<std::string> tempEntity;
     tempEntity.push_back(name);
@@ -597,8 +608,12 @@ void EntityDialog::saveAndClose() {
 		dataInterface->assignedRelationships[l][0] = newLabel;
 	      }
 	    }
-	  }
-	  if (dataInterface->relationships[j][3] == permanentName) {
+	    for (std::vector <std::vector <std::string> >::size_type l = 0; l != dataInterface->relationMemos.size(); l++) {
+	      if (dataInterface->relationMemos[l][0] == oldLabel) {
+		dataInterface->relationMemos[l][0] = newLabel;
+	      }
+	    }
+	  } else if (dataInterface->relationships[j][3] == permanentName) {
 	    std::string currentRelType = dataInterface->relationships[j][2];
 	    std::string directedness = "";
 	    for (std::vector <std::vector <std::string> >::size_type k = 0; k != dataInterface->relationshipTypes.size(); k++) {
@@ -620,6 +635,11 @@ void EntityDialog::saveAndClose() {
 	    for (std::vector <std::vector <std::string> >::size_type l = 0; l != dataInterface->assignedRelationships.size(); l++) {
 	      if (dataInterface->assignedRelationships[l][0] == oldLabel) {
 		dataInterface->assignedRelationships[l][0] = newLabel;
+	      }
+	    }
+	    for (std::vector <std::vector <std::string> >::size_type l = 0; l != dataInterface->relationMemos.size(); l++) {
+	      if (dataInterface->relationMemos[l][0] == oldLabel) {
+		dataInterface->relationMemos[l][0] = newLabel;
 	      }
 	    }
 	  }

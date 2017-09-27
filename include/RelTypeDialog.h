@@ -35,7 +35,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QTextEdit>
+#include <QPlainTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QDateTime>
@@ -52,6 +52,9 @@ public:
 		const QString &label = QString(), Logger *subLogger = new Logger);
   // Should add another constructor for the edit button
   ~RelTypeDialog() {};
+
+  std::string getOldName();
+  std::string getNewName();			  
 		     
 private slots:
   void setName(const QString &newName);
@@ -79,7 +82,7 @@ private:
   
   QPointer<QLineEdit> nameField;
 
-  QPointer<QTextEdit> descriptionField;
+  QPointer<QPlainTextEdit> descriptionField;
 
   QString directedness;
   QString permanentDirectedness;

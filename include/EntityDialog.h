@@ -35,6 +35,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QDialog>
+#include <QPlainTextEdit>
 #include "../include/AttributesDialog.h"
 #include "../include/DataInterface.h"
 #include "../include/Logger.h"
@@ -47,6 +48,9 @@ public:
 	       const QString &label = QString(), Logger *subLogger = new Logger);
   ~EntityDialog() {};
 
+  std::string getOldName();
+  std::string getNewName();
+		    
 private slots:
 
   void setName(const QString &newName);
@@ -66,6 +70,7 @@ private slots:
   void cancelAndClose();
   void saveAndClose();
   bool eventFilter(QObject *target, QEvent *event);
+
   
 private:
   DataInterface *dataInterface;
@@ -90,7 +95,7 @@ private:
   QPointer<QLineEdit> valueField;
   QPointer<QLineEdit> attributesFilterField;
 
-  QPointer<QTextEdit> descriptionField;
+  QPointer<QPlainTextEdit> descriptionField;
 
   QPointer<QListWidget> entityAttributesListWidget;
   QPointer<QListWidget> attributesPoolListWidget;

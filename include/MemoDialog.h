@@ -38,7 +38,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QTextEdit>
+#include <QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QEvent>
 #include <QKeyEvent>
@@ -60,7 +60,7 @@ private slots:
   
 private:
   QPointer<QLabel> memoLabel;
-  QPointer<QTextEdit> memoField;
+  QPointer<QPlainTextEdit> memoField;
   QPointer<QPushButton> saveCloseButton;
 
   std::vector <std::vector <std::string> >::size_type eventIndex;

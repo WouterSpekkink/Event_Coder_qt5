@@ -2246,6 +2246,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     cypherOut << "// Start of block where attributes are created.\n\n";
     std::vector <std::vector <std::string> >::iterator iaIt;
     int counter = 0;
+    int counter2 = 0;
     for (iaIt = assignedIncidentAttributes.begin(); iaIt != assignedIncidentAttributes.end(); iaIt++) {
       std::vector<std::string> currentAttribute = *iaIt;
       std::vector <std::vector <std::string> >::iterator uiaIt;
@@ -2265,7 +2266,6 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       cypherOut << "CREATE (" << curA  << ":Incident_Attribute {id: " << "\""
 		<< currentAttribute[0] << "\"" << ", description: " << "\"" << desc << "\"})\n"; 
       std::vector<std::string>::iterator eIt;
-      int counter2 = 0;
       for (eIt = currentAttribute.begin() + 1; eIt != currentAttribute.end(); eIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
 	std::istringstream ss(*eIt);
@@ -2285,7 +2285,8 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	std::string curI = "mI" + ss2.str();
 	edgesOut << currentAttribute[0] << "," << currentEvent + 1 << "," << "Directed" << ","
 		 << "IS_ATTRIBUTE_OF" << "," <<  "\"" << currentValue << "\"" << "\n";
-	cypherOut << "WITH " << curA << "\nMATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
+	cypherOut << "WITH " << curA << "\n"
+		  << "OPTIONAL MATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
 		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: " << "\"" << currentValue
 		  << "\"}]->(" << curI <<")\n"; 
       }
@@ -2293,7 +2294,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     nodesOut.close();
     edgesOut.close();
 
-    cypherOut << "\n// End of block where incident attributes are created./n/n";
+    cypherOut << "\n// End of block where incident attributes are created.\n\n";
     
     fileName  = "Incident_Attributes_Matrix.csv";
     filePath = path;
@@ -2356,6 +2357,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       cypherOut << "// Start of block where incident categories are created.\n\n";
       std::vector <std::vector <std::string> >::iterator icIt;
       int counter = 0;
+      int counter2 = 0;
       for (icIt = assignedIncidentAttributeCategories.begin(); icIt != assignedIncidentAttributeCategories.end(); icIt++) {
 	std::vector<std::string> currentCategory = *icIt;
 	std::vector <std::vector <std::string> >::iterator uicIt;
@@ -2375,14 +2377,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	cypherOut << "CREATE (" << curC << ":Incident_Category {id: \"" << currentCategory[0] << "\", description: \""
 		  << desc << "\"})\n";  
 	std::vector<std::string>::iterator caIt;
-	int counter2 = 0;
 	for (caIt = currentCategory.begin() + 1; caIt != currentCategory.end(); caIt++) {
 	  std::stringstream ss2;
 	  ss2 << counter2;
 	  counter2++;
 	  std::string curA = "Ac" + ss2.str();
 	  edgesOut << *caIt << "," << currentCategory[0]  << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
-	  cypherOut << "WITH " << curC << "\n" << "MATCH (" << curA << ":Incident_Attribute {id: \"" << *caIt  << "\"})\n"
+	  cypherOut << "WITH " << curC << "\n"
+		    << "OPTIONAL MATCH (" << curA << ":Incident_Attribute {id: \"" << *caIt  << "\"})\n"
 		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC << ")\n";
 	}
       }
@@ -2423,6 +2425,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     std::vector<std::vector <std::string> >tempEntities;
     std::vector<std::vector <std::string> >::iterator rIt;
     int counter = 0;
+    int counter2 = 0;
     for (rIt = assignedRelationships.begin(); rIt != assignedRelationships.end(); rIt++) {
       std::vector<std::string> currentAssigned = *rIt;
       std::string currentMemo;
@@ -2441,7 +2444,6 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       cypherOut << "CREATE (" << curR << ":Entity_Relationship {id: \"" << currentAssigned[0]
 		<< "\", memo: \"" << currentMemo << "\"})\n";   
       std::vector<std::string>::iterator arIt;
-      int counter2 = 0;
       for (arIt = currentAssigned.begin() + 1; arIt != currentAssigned.end(); arIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
 	std::istringstream ss(*arIt);
@@ -2450,12 +2452,12 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	std::stringstream ms2;
 	ms2 << counter2;
 	counter2++;
-	std::string curI = "rI" + ms2.str();
+	std::string curI = "p" + ms2.str();
 	
 	relIndEdgesOut << currentEvent + 1 << "," << currentAssigned[0] << "," << "Directed"
 		       << "," << "IS_INDICATOR_OF" << "\n";
 	cypherOut << "WITH " << curR << "\n"
-		  << "MATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
+		  << "OPTIONAL MATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
 		  << "MERGE (" << curI << ")-[:IS_INDICATOR_OF]->(" << curR <<")\n";
       }
       int counter3 = 0;
@@ -2542,19 +2544,19 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	      std::stringstream ms2;
 	      ms2 << counter5;
 	      counter5++;
-	      std::string curRe = "rEt" + ms2.str();
+	      std::string curRe = "g" + ms2.str();
 	      
 	      cypherOut << "WITH " << curE << "\n"
-			<< "MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
+			<< "OPTIONAL MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
 			<< "MERGE (" << curE << ")-[:IS_SOURCE_IN]->(" << curRe << ")\n";
 	    } else if (*(rIt4->begin() + 3) == currentTemp[0]) {
 	      std::stringstream ms2;
 	      ms2 << counter5;
 	      counter5++;
-	      std::string curRe = "rEt" + ms2.str();
+	      std::string curRe = "g" + ms2.str();
 	      
 	      cypherOut << "WITH " << curE << "\n"
-			<< "MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
+			<< "OPTIONAL MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
 			<< "MERGE (" << curE << ")-[:IS_TARGET_IN]->(" << curRe << ")\n";
 	    }
 	  }
@@ -2588,6 +2590,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     
     std::vector<std::vector <std::string> >::iterator aIt;
     int counter = 0;
+    int counter2 = 0;
     for (aIt = assignedEntityAttributes.begin(); aIt != assignedEntityAttributes.end(); aIt++) {
       std::vector<std::string> currentAttribute = *aIt;
       std::vector<std::vector <std::string> >::iterator aIt2;
@@ -2603,13 +2606,12 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       std::stringstream ms;
       ms << counter;
       counter++;
-      std::string curA = "ea" + ms.str();
+      std::string curA = "b" + ms.str();
       
       cypherOut << "CREATE (" << curA << ":Entity_Attribute {id: \"" << currentAttribute[0]
 		<< "\", description: \"" << attDesc << "\"})\n";
       
       std::vector<std::string>::iterator aIt3;
-      int counter2 = 0;
       for (aIt3 = currentAttribute.begin() + 1; aIt3 != currentAttribute.end(); aIt3++) {
 	std::string value = "";
 	std::vector <std::vector <std::string> >::iterator valIt;
@@ -2624,14 +2626,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	std::stringstream ms2;
 	ms2 << counter2;
 	counter2++;
-	std::string curE = "enA" + ms2.str();
+	std::string curE = "x" + ms2.str();
 	
 	cypherOut << "WITH " << curA << "\n"
-		  << "MATCH (" << curE << " {id: \"" << *aIt3 << "\"})\n"
+		  << "OPTIONAL MATCH (" << curE << ":Entity {id: \"" << *aIt3 << "\"})\n"
 		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: \"" << value << "\"}]->(" << curE << ")\n";
       }
     }
-    
+ 
     cypherOut << "\n // End of block where entity attributes are created.\n\n";
     
     eaNodesOut.close();
@@ -2727,7 +2729,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	std::stringstream ms;
 	ms << counter;
 	counter++;
-	std::string curC = "eC" + ms.str();
+	std::string curC = "q" + ms.str();
 	
 	cypherOut << "CREATE (" << curC << ":Entity_Category {id: \"" << *ecIt->begin()
 		  << "\", description: \"" << *(ecIt->begin() + 1) << "\"})\n";
@@ -2742,7 +2744,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  std::string curA = "eCa" + ms2.str();
 	  
 	  cypherOut << "WITH " << curC << "\n"
-		    << "MATCH (" << curA << " {id: \"" << *ecIt3 << "\"})\n"
+		    << "OPTIONAL MATCH (" << curA << " {id: \"" << *ecIt3 << "\"})\n"
 		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC <<")\n";
 	  assigned = false;
 	}

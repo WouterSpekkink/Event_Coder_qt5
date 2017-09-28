@@ -2352,6 +2352,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       
       nodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
       edgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
+      
       cypherOut << "// Start of block where incident categories are created.\n\n";
       std::vector <std::vector <std::string> >::iterator icIt;
       int counter = 0;
@@ -2374,10 +2375,15 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	cypherOut << "CREATE (" << curC << ":Incident_Category {id: \"" << currentCategory[0] << "\", description: \""
 		  << desc << "\"})\n";  
 	std::vector<std::string>::iterator caIt;
+	int counter2 = 0;
 	for (caIt = currentCategory.begin() + 1; caIt != currentCategory.end(); caIt++) {
+	  std::stringstream ss2;
+	  ss2 << counter2;
+	  counter2++;
+	  std::string curA = "Ac" + ss2.str();
 	  edgesOut << *caIt << "," << currentCategory[0]  << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
-	  cypherOut << "WITH " << curC << "\n" << "MATCH (a:Incident_Attribute {id: \"" << *caIt  << "\"})\n"
-		    << "MERGE (a)-[:IS_IN_CATEGORY]->(" << curC << ")\n";
+	  cypherOut << "WITH " << curC << "\n" << "MATCH (" << curA << ":Incident_Attribute {id: \"" << *caIt  << "\"})\n"
+		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC << ")\n";
 	}
       }
       nodesOut.close();

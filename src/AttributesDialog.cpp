@@ -240,6 +240,9 @@ void AttributesDialog::assignCategory() {
     bool foundCategory = false;
     bool foundAttribute = false;
     std::vector <std::vector <std::string> >::size_type categoryIndex;
+    permanentName.erase(std::remove(permanentName.begin(), permanentName.end(), ';'), permanentName.end());
+    permanentName.erase(std::remove(permanentName.begin(), permanentName.end(), '|'), permanentName.end());
+    permanentName.erase(permanentName.find_last_not_of(" \n\r\t")+1);
     if (submittedType == INCIDENT) {
       for (std::vector <std::vector <std::string> >::size_type i = 0;
 	   i != dataInterface->assignedIncidentAttributeCategories.size(); i++) {

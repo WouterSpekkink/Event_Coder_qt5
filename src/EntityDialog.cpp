@@ -275,6 +275,9 @@ void EntityDialog::assignAttribute() {
   std::vector <std::vector <std::string> >::iterator sIt;
   bool foundAttribute = false;
   bool foundEntity = false;
+  permanentName.erase(std::remove(permanentName.begin(), permanentName.end(), ';'), permanentName.end());
+  permanentName.erase(std::remove(permanentName.begin(), permanentName.end(), '|'), permanentName.end());
+  permanentName.erase(permanentName.find_last_not_of(" \n\r\t")+1);
   std::vector <std::vector <std::string> >::size_type attributeIndex;
   for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedEntityAttributes.size(); i++) {
     std::vector<std::string> currentGroup = dataInterface->assignedEntityAttributes[i];

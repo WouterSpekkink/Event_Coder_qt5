@@ -1229,10 +1229,10 @@ void MainDialog::setRelMemo(const QString &newRelMemo) {
     std::string temp = newRelMemo.toStdString();
     temp.erase(std::remove(temp.begin(), temp.end(), ';'), temp.end());
     temp.erase(std::remove(temp.begin(), temp.end(), '|'), temp.end());
-    currentRelMemo = QString::fromStdString(temp);
+    temp.erase(temp.find_last_not_of(" \n\r\t")+1);
     std::vector <std::vector <std::string> >::iterator it;
     if (currentRelMemo != "") {
-      std::vector<std::string> tempRelMemo;
+      std::vector<std::string> tempRelMemo;      
       tempRelMemo.push_back(currentRelationship.toStdString());
       tempRelMemo.push_back(currentRelMemo.toStdString());
       bool found = false;

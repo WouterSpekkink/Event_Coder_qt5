@@ -835,7 +835,7 @@ void MainDialog::nextLeftEventFiltered() {
       QString::fromStdString(dataInterface->header[leftFieldIndex]) + "\"";
     logger->addToLog(newLog);
     std::vector <std::vector <std::string> >::size_type index;
-    for (index = eventIndex; index != dataInterface->rowData.size() ; index++) {
+    for (index = eventIndex; index != dataInterface->rowData.size(); index++) {
       if (index != eventIndex) {
 	std::size_t found = (dataInterface->rowData[index][leftFieldIndex]).find(currentLeftEventFilter.toStdString());
 	if (found != std::string::npos) {
@@ -903,7 +903,7 @@ void MainDialog::nextRightEventFiltered() {
       QString::fromStdString(dataInterface->header[rightFieldIndex]) + "\"";
     logger->addToLog(newLog);
     std::vector <std::vector <std::string> >::size_type index;
-    for (index = eventIndex; dataInterface->rowData.size(); index++) {
+    for (index = eventIndex; index != dataInterface->rowData.size(); index++) {
       if (index != eventIndex) {
 	std::size_t found = (dataInterface->rowData[index][rightFieldIndex]).find(currentRightEventFilter.toStdString());
 	if (found != std::string::npos) {

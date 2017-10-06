@@ -68,7 +68,7 @@ AttributesDialog::AttributesDialog(QWidget *parent, DataInterface *interface,
     submittedLabel = label;
     if (submittedLabel == EMPTY) {
       name = "";
-      permanentName = "";
+      permanentName = "&&NEW&&";
       description = "";
     } else {
       name = submittedLabel.toStdString();
@@ -202,32 +202,6 @@ AttributesDialog::AttributesDialog(QWidget *parent, DataInterface *interface,
 void AttributesDialog::setName(const QString &newName) {
   disableCategorySelection();
   name = newName.toStdString();
-  // If this is a new attribute, then we should also change the assigned categories whenever we change the name.
-  if (submittedLabel == EMPTY) {
-    std::string oldName = permanentName;
-    permanentName = name;
-    if (submittedType == INCIDENT) {
-      for (std::vector <std::vector <std::string> >::size_type i = 0;
-	   i != dataInterface->assignedIncidentAttributeCategories.size(); i++) {
-	std::vector<std::string> currentCategory = dataInterface->assignedIncidentAttributeCategories[i];
-	for (std::vector<std::string>::size_type j = 1; j != currentCategory.size(); j++) {
-	  if (dataInterface->assignedIncidentAttributeCategories[i][j] == oldName) {
-	    dataInterface->assignedIncidentAttributeCategories[i][j] = name;
-	  }
-	}
-      }
-    } else if (submittedType == ENTITY) {
-      for (std::vector <std::vector <std::string> >::size_type i = 0;
-	   i != dataInterface->assignedEntityAttributeCategories.size(); i++) {
-	std::vector<std::string> currentCategory = dataInterface->assignedEntityAttributeCategories[i];
-	for (std::vector<std::string>::size_type j = 1; j != currentCategory.size(); j++) {
-	  if (dataInterface->assignedEntityAttributeCategories[i][j] == oldName) {
-	    dataInterface->assignedEntityAttributeCategories[i][j] = name;
-	  }
-	}
-      }
-    }
-  }
 }
 
 void AttributesDialog::setCurrentCategory(QListWidgetItem *item) {
@@ -805,6 +779,14 @@ void AttributesDialog::saveAndClose() {
 	}
       }
       if (createNew) {
+	for (std::vector <std::vector <std::string> >::size_type j = 0;
+	     j != dataInterface->assignedIncidentAttributeCategories.size(); j++) {
+	  for (std::vector<std::string>::size_type k = 1; k != dataInterface->assignedIncidentAttributeCategories[j].size(); k++) {
+	    if (dataInterface->assignedIncidentAttributeCategories[j][k] == "&&NEW&&") {
+	      dataInterface->assignedIncidentAttributeCategories[j][k] = name;
+	    }
+	  }
+	}
 	QDateTime time = QDateTime::currentDateTime();
 	QString timeText = time.toString(Qt::TextDate);
 	QString newLog = timeText + " - " + "Created new entity attribute " + QString::fromStdString(name);
@@ -836,7 +818,7 @@ bool AttributesDialog::eventFilter(QObject *target, QEvent *event) {
   if (target == nameField || target == descriptionField) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Ampersand) {
 	return true;
       }
     }

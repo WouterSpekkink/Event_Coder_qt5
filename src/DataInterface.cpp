@@ -2209,7 +2209,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     std::string curI = "I" + ss.str();
     if (index.size() == 0) {
       fileOut << counter << "," << counter << ",\"" << currentMemo << "\"\n";
-      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << "\"})\n";
+      cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << "\"})\n\n";
     } else {
       fileOut << counter << "," << counter << ",\"" << currentMemo << "\",";
       cypherOut << "CREATE (" << curI << ":Incident {id: " << counter << ", memo: \"" << currentMemo << "\", ";
@@ -2219,7 +2219,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  cypherOut << cypherTemp[i] << ": " << "\"" << currentRow[index[i]] << "\", ";
 	} else {
 	  fileOut << "\"" << currentRow[index[i]] << "\"" << "\n";
-	  cypherOut << cypherTemp[i] << ": " << "\"" << currentRow[index[i]] << "\"})\n";
+	  cypherOut << cypherTemp[i] << ": " << "\"" << currentRow[index[i]] << "\"})\n\n";
 	}
       }
     }
@@ -2264,7 +2264,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       std::string curA = "A" + ss.str();
       counter++;
       cypherOut << "CREATE (" << curA  << ":Incident_Attribute {id: " << "\""
-		<< currentAttribute[0] << "\"" << ", description: " << "\"" << desc << "\"})\n"; 
+		<< currentAttribute[0] << "\"" << ", description: " << "\"" << desc << "\"})\n\n"; 
       std::vector<std::string>::iterator eIt;
       for (eIt = currentAttribute.begin() + 1; eIt != currentAttribute.end(); eIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
@@ -2288,7 +2288,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	cypherOut << "WITH " << curA << "\n"
 		  << "OPTIONAL MATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
 		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: " << "\"" << currentValue
-		  << "\"}]->(" << curI <<")\n"; 
+		  << "\"}]->(" << curI <<")\n\n"; 
       }
     }
     nodesOut.close();
@@ -2375,7 +2375,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	std::string curC = "C" + ss.str();
 	nodesOut << currentCategory[0] << "," << currentCategory[0] << "," << "\"" << desc << "\"" << "," << "Category" << "\n";
 	cypherOut << "CREATE (" << curC << ":Incident_Category {id: \"" << currentCategory[0] << "\", description: \""
-		  << desc << "\"})\n";  
+		  << desc << "\"})\n\n";  
 	std::vector<std::string>::iterator caIt;
 	for (caIt = currentCategory.begin() + 1; caIt != currentCategory.end(); caIt++) {
 	  std::stringstream ss2;
@@ -2385,7 +2385,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  edgesOut << *caIt << "," << currentCategory[0]  << "," << "Directed" << "," << "IS_IN_CATEGORY" << "\n";
 	  cypherOut << "WITH " << curC << "\n"
 		    << "OPTIONAL MATCH (" << curA << ":Incident_Attribute {id: \"" << *caIt  << "\"})\n"
-		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC << ")\n";
+		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC << ")\n\n";
 	}
       }
       nodesOut.close();
@@ -2420,6 +2420,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     relIndNodesOut << "Id" << "," << "Label" << "," << "Memo" << "," << "Type" << "\n";
     relIndEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
     relEntEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
+
     cypherOut << "// Start of block where entity relationships are created.\n\n";
     
     std::vector<std::vector <std::string> >tempEntities;
@@ -2442,7 +2443,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       relIndNodesOut  << currentAssigned[0] << "," << currentAssigned[0] << "," << "\""
 		      << currentMemo << "\"" << "," << "Relationship" << "\n";
       cypherOut << "CREATE (" << curR << ":Entity_Relationship {id: \"" << currentAssigned[0]
-		<< "\", memo: \"" << currentMemo << "\"})\n";   
+		<< "\", memo: \"" << currentMemo << "\"})\n\n";   
       std::vector<std::string>::iterator arIt;
       for (arIt = currentAssigned.begin() + 1; arIt != currentAssigned.end(); arIt++) {
 	std::vector<std::vector <std::string> >::size_type currentEvent;
@@ -2458,7 +2459,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 		       << "," << "IS_INDICATOR_OF" << "\n";
 	cypherOut << "WITH " << curR << "\n"
 		  << "OPTIONAL MATCH (" << curI << ":Incident {id: " << currentEvent + 1 << "})\n"
-		  << "MERGE (" << curI << ")-[:IS_INDICATOR_OF]->(" << curR <<")\n";
+		  << "MERGE (" << curI << ")-[:IS_INDICATOR_OF]->(" << curR <<")\n\n";
       }
       int counter3 = 0;
       std::vector<std::vector <std::string> >::iterator rIt2;
@@ -2514,11 +2515,16 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  counter3++;
 	  
 	  cypherOut << "SET " << curR << ".directedness = \"" << direction << "\"\nSET "<< curR << ".label = \"" << relLabel
-		    << "\"\nSET " << curR << ".description = \"" << descRel << "\"\n";
+		    << "\"\nSET " << curR << ".description = \"" << descRel << "\"\n\n";
 		     
 	}
       }
     }
+
+    cypherOut << "\n// End of block where relationships are created.\n\n";
+
+    cypherOut << "// Start of block where entities are created.\n\n";
+    
     sort(tempEntities.begin(), tempEntities.end());
     tempEntities.erase(unique(tempEntities.begin(), tempEntities.end()), tempEntities.end());
     std::vector <std::vector <std::string> >::iterator teIt;
@@ -2532,7 +2538,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       counter4++;
       std::string curE = "e" + ms.str();
       
-      cypherOut << "CREATE (" << curE << ":Entity {id: \"" << currentTemp[0] << "\", description: \"" << currentTemp[1] << "\"})\n";
+      cypherOut << "CREATE (" << curE << ":Entity {id: \"" << currentTemp[0] << "\", description: \"" << currentTemp[1] << "\"})\n\n";
 
       std::vector <std::vector <std::string> >::iterator rIt3;
       std::vector <std::vector <std::string> >::iterator rIt4;
@@ -2548,7 +2554,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	      
 	      cypherOut << "WITH " << curE << "\n"
 			<< "OPTIONAL MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
-			<< "MERGE (" << curE << ")-[:IS_SOURCE_IN]->(" << curRe << ")\n";
+			<< "MERGE (" << curE << ")-[:IS_SOURCE_IN]->(" << curRe << ")\n\n";
 	    } else if (*(rIt4->begin() + 3) == currentTemp[0]) {
 	      std::stringstream ms2;
 	      ms2 << counter5;
@@ -2557,14 +2563,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	      
 	      cypherOut << "WITH " << curE << "\n"
 			<< "OPTIONAL MATCH (" << curRe << ":Entity_Relationship {id: \"" << *(rIt3->begin()) << "\"})\n"
-			<< "MERGE (" << curE << ")-[:IS_TARGET_IN]->(" << curRe << ")\n";
+			<< "MERGE (" << curE << ")-[:IS_TARGET_IN]->(" << curRe << ")\n\n";
 	    }
 	  }
 	}
       }
     }
 
-    cypherOut << "\n// End of block where relationships are created.\n\n";
+    cypherOut << "\n// End of block where entities are created.\n\n";
     
     relNodesOut.close();
     relEdgesOut.close();
@@ -2586,7 +2592,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     eaNodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
     eaEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Value" << "," << "Label" << "\n";    
 
-    cypherOut << "// Start of block where entity relationships are created.\n\n";
+    cypherOut << "// Start of block where entity attributes are created.\n\n";
     
     std::vector<std::vector <std::string> >::iterator aIt;
     int counter = 0;
@@ -2609,7 +2615,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
       std::string curA = "b" + ms.str();
       
       cypherOut << "CREATE (" << curA << ":Entity_Attribute {id: \"" << currentAttribute[0]
-		<< "\", description: \"" << attDesc << "\"})\n";
+		<< "\", description: \"" << attDesc << "\"})\n\n";
       
       std::vector<std::string>::iterator aIt3;
       for (aIt3 = currentAttribute.begin() + 1; aIt3 != currentAttribute.end(); aIt3++) {
@@ -2630,7 +2636,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	
 	cypherOut << "WITH " << curA << "\n"
 		  << "OPTIONAL MATCH (" << curE << ":Entity {id: \"" << *aIt3 << "\"})\n"
-		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: \"" << value << "\"}]->(" << curE << ")\n";
+		  << "MERGE (" << curA << ")-[:IS_ATTRIBUTE_OF {value: \"" << value << "\"}]->(" << curE << ")\n\n";
       }
     }
  
@@ -2707,6 +2713,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
     
     ecNodesOut << "Id" << "," << "Label" << "," << "Description" << "," << "Type" << "\n";
     ecEdgesOut << "Source" << "," << "Target" << "," << "Type" << "," << "Label" << "\n";
+    
     cypherOut << "// Start of block where entity categories are created.\n\n";
 
     std::vector <std::vector <std::string> >::iterator ecIt;
@@ -2732,7 +2739,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	std::string curC = "q" + ms.str();
 	
 	cypherOut << "CREATE (" << curC << ":Entity_Category {id: \"" << *ecIt->begin()
-		  << "\", description: \"" << *(ecIt->begin() + 1) << "\"})\n";
+		  << "\", description: \"" << *(ecIt->begin() + 1) << "\"})\n\n";
 
 	std::vector<std::string>::iterator ecIt3;
 	for (ecIt3 = currentCategory.begin() + 1; ecIt3 != currentCategory.end(); ecIt3++) {
@@ -2744,12 +2751,14 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
 	  std::string curA = "eCa" + ms2.str();
 	  
 	  cypherOut << "WITH " << curC << "\n"
-		    << "OPTIONAL MATCH (" << curA << " {id: \"" << *ecIt3 << "\"})\n"
-		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC <<")\n";
+		    << "OPTIONAL MATCH (" << curA << ":Entity_Attribute {id: \"" << *ecIt3 << "\"})\n"
+		    << "MERGE (" << curA << ")-[:IS_IN_CATEGORY]->(" << curC <<")\n\n";
 	  assigned = false;
 	}
       }
     }
+
+    
 
     cypherOut << "\n // End of block where entity categories are created.";
     

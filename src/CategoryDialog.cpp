@@ -65,7 +65,7 @@ CategoryDialog::CategoryDialog(QWidget *parent, DataInterface *interface,
   } else if (type == ENTITY) {
     if (submittedLabel == EMPTY) {
       name = "";
-      permanentName = "";
+      permanentName = "&&NEW&&";
       description = "";
     } else {
       name = submittedLabel.toStdString();
@@ -122,9 +122,6 @@ CategoryDialog::CategoryDialog(QWidget *parent, DataInterface *interface,
 
 void CategoryDialog::setName(const QString &newName) {
   name = newName.toStdString();
-  if (submittedLabel == EMPTY) {
-    permanentName = name;
-  }
 }
 
 void CategoryDialog::cancelAndClose() {
@@ -296,7 +293,7 @@ bool CategoryDialog::eventFilter(QObject *target, QEvent *event) {
   if (target == nameField || target == descriptionField) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Ampersand) {
 	return true;
       }
     }

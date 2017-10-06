@@ -45,7 +45,7 @@ EntityDialog::EntityDialog(QWidget *parent, DataInterface *interface, const QStr
   currentValue = "";
   if (submittedLabel == EMPTY) {
     name = "";
-    permanentName = "";
+    permanentName = "&&NEW&&";
     description = "";
   } else {
     name = submittedLabel.toStdString();
@@ -186,18 +186,6 @@ EntityDialog::EntityDialog(QWidget *parent, DataInterface *interface, const QStr
     
 void EntityDialog::setName(const QString &newName) {
   name = newName.toStdString();
-  if (submittedLabel == EMPTY) {
-    std::string oldName = permanentName;
-    permanentName = name;
-    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->relationships.size(); i++) {
-      if (dataInterface->relationships[i][1] == oldName) {
-	dataInterface->relationships[i][1] = name;
-      }
-      if (dataInterface->relationships[i][3] == oldName) {
-	dataInterface->relationships[i][3] = name;
-      }
-    }
-  }
 }
 
 void EntityDialog::setValue(const QString &newValue) {
@@ -654,6 +642,14 @@ void EntityDialog::saveAndClose() {
       }
     }
     if (createNew) {
+      for (std::vector <std::vector <std::string> >::size_type j = 0; j != dataInterface->assignedEntityAttributes.size(); j++) {
+	std::vector<std::string> currentAttribute = dataInterface->assignedEntityAttributes[j];
+	for (std::vector<std::string>::size_type k = 1; k != currentAttribute.size(); k++) {
+	  if (dataInterface->assignedEntityAttributes[j][k] == "&&NEW&&") {
+	    dataInterface->assignedEntityAttributes[j][k] = name;
+	  }
+	}
+      }
       QDateTime time = QDateTime::currentDateTime();
       QString timeText = time.toString(Qt::TextDate);
       QString newLog = timeText + " - " + "Created new entity " + QString::fromStdString(name);
@@ -684,7 +680,7 @@ bool EntityDialog::eventFilter(QObject *target, QEvent *event) {
   if (target == valueField || target == nameField || target == descriptionField) {
     if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+      if (keyEvent->key() == Qt::Key_Semicolon || keyEvent->key() == Qt::Key_Bar || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Ampersand) {
 	return true;
       }
     }

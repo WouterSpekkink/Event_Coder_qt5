@@ -1230,6 +1230,7 @@ void MainDialog::setRelMemo(const QString &newRelMemo) {
     temp.erase(std::remove(temp.begin(), temp.end(), ';'), temp.end());
     temp.erase(std::remove(temp.begin(), temp.end(), '|'), temp.end());
     temp.erase(temp.find_last_not_of(" \n\r\t")+1);
+    currentRelMemo = QString::fromStdString(temp);
     std::vector <std::vector <std::string> >::iterator it;
     if (currentRelMemo != "") {
       std::vector<std::string> tempRelMemo;      

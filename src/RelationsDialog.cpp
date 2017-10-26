@@ -560,7 +560,7 @@ void RelationsDialog::updateLeftList() {
   sourceListWidget->clear();
   for (sIt = dataInterface->entities.begin(); sIt != dataInterface->entities.end(); sIt++) {
     std::vector<std::string> entity= *sIt;
-    if (entity[0] != currentLeftEntitySelected.toStdString()) {
+    if (entity[0] != currentLeftEntitySelected.toStdString() && entity[0] != currentRightEntitySelected.toStdString()) {
       if (currentLeftEntityFilter != "") {
 	std::size_t found = entity[0].find(currentLeftEntityFilter.toStdString());
 	if (found != std::string::npos) {
@@ -585,6 +585,7 @@ void RelationsDialog::updateLeftList() {
 
 void RelationsDialog::updateMiddleList() {
   std::vector <std::vector <std::string> >::iterator sIt2;
+  typeListWidget->clear();
   for (sIt2 = dataInterface->relationshipTypes.begin(); sIt2 != dataInterface->relationshipTypes.end(); sIt2++) {
     std::vector<std::string> relationshipType = *sIt2;
     if (relationshipType[0] != currentRelTypeSelected.toStdString()) {
@@ -612,9 +613,10 @@ void RelationsDialog::updateMiddleList() {
 
 void RelationsDialog::updateRightList() {
   std::vector <std::vector <std::string> >::iterator sIt;
+  targetListWidget->clear();
   for (sIt = dataInterface->entities.begin(); sIt != dataInterface->entities.end(); sIt++) {
     std::vector<std::string> entity= *sIt;
-    if (entity[0] != currentRightEntitySelected.toStdString()) {
+    if (entity[0] != currentLeftEntitySelected.toStdString() && entity[0] != currentRightEntitySelected.toStdString()) {
       if (currentRightEntityFilter != "") {
 	std::size_t found = entity[0].find(currentRightEntityFilter.toStdString());
 	if (found != std::string::npos) {

@@ -71,6 +71,9 @@ private slots:
   void removeRelTypes();
   
   void updateTexts();
+  void updateLeftList();
+  void updateMiddleList();
+  void updateRightList();
   void disableAssign();
   void reset();
   void cancelAndClose();

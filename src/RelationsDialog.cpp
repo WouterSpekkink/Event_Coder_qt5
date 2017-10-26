@@ -227,7 +227,7 @@ RelationsDialog::RelationsDialog(QWidget *parent, DataInterface *interface, cons
 
   setLayout(mainLayout);
   setWindowTitle("Add / Edit Relationship");
-  resize(600, 100);
+  resize(600, 600);
 
   updateTexts();
   // And that finishes this constructor.
@@ -298,19 +298,19 @@ void RelationsDialog::assignRightEntity() {
 void RelationsDialog::filterLeftEntity(const QString &text) {
   disableAssign();
   currentLeftEntityFilter = text;
-  updateTexts();
+  updateLeftList();
 }
 
 void RelationsDialog::filterTypes(const QString &text) {
   disableAssign();
   currentRelTypeFilter = text;
-  updateTexts();
+  updateMiddleList();
 }
 
 void RelationsDialog::filterRightEntity(const QString &text) {
   disableAssign();
   currentRightEntityFilter = text;
-  updateTexts();
+  updateRightList();
 }
 
 void RelationsDialog::addEntity() {
@@ -553,6 +553,88 @@ void RelationsDialog::disableAssign() {
   assignLeftEntityButton->setEnabled(false);
   assignRightEntityButton->setEnabled(false);
   assignTypeButton->setEnabled(false);
+}
+
+void RelationsDialog::updateLeftList() {
+  std::vector <std::vector <std::string> >::iterator sIt;
+  sourceListWidget->clear();
+  for (sIt = dataInterface->entities.begin(); sIt != dataInterface->entities.end(); sIt++) {
+    std::vector<std::string> entity= *sIt;
+    if (entity[0] != currentLeftEntitySelected.toStdString()) {
+      if (currentLeftEntityFilter != "") {
+	std::size_t found = entity[0].find(currentLeftEntityFilter.toStdString());
+	if (found != std::string::npos) {
+	  sourceListWidget->addItem(QString::fromStdString(entity[0]));
+	}
+      } else {
+	sourceListWidget->addItem(QString::fromStdString(entity[0]));
+      }
+    }
+    for (int i = 0; i != sourceListWidget->count(); i++) {
+      std::string currentItem = sourceListWidget->item(i)->text().toStdString();
+      std::vector <std::vector <std::string> >::iterator it;
+      for (it = dataInterface->entities.begin(); it != dataInterface->entities.end(); it++) {
+	std::vector<std::string> currentEntity = *it;
+	if (currentEntity[0] == currentItem) {
+	  sourceListWidget->item(i)->setToolTip(QString::fromStdString(currentEntity[1]));
+	}
+      }
+    }
+  }
+}
+
+void RelationsDialog::updateMiddleList() {
+  std::vector <std::vector <std::string> >::iterator sIt2;
+  for (sIt2 = dataInterface->relationshipTypes.begin(); sIt2 != dataInterface->relationshipTypes.end(); sIt2++) {
+    std::vector<std::string> relationshipType = *sIt2;
+    if (relationshipType[0] != currentRelTypeSelected.toStdString()) {
+      if (currentRelTypeFilter != "") {
+	std::size_t found = relationshipType[0].find(currentRelTypeFilter.toStdString());
+	if (found != std::string::npos) {
+	  typeListWidget->addItem(QString::fromStdString(relationshipType[0]));
+	}
+      } else {
+	typeListWidget->addItem(QString::fromStdString(relationshipType[0]));
+      }
+    }
+    for (int i = 0; i != typeListWidget->count(); i++) {
+      std::string currentItem = typeListWidget->item(i)->text().toStdString();
+      std::vector <std::vector <std::string> >::iterator it;
+      for (it = dataInterface->relationshipTypes.begin(); it != dataInterface->relationshipTypes.end(); it++) {
+	std::vector<std::string> currentRelationshipType = *it;
+	if (currentRelationshipType[0] == currentItem) {
+	  typeListWidget->item(i)->setToolTip(QString::fromStdString(currentRelationshipType[1]));
+	}
+      }
+    }
+  }
+}
+
+void RelationsDialog::updateRightList() {
+  std::vector <std::vector <std::string> >::iterator sIt;
+  for (sIt = dataInterface->entities.begin(); sIt != dataInterface->entities.end(); sIt++) {
+    std::vector<std::string> entity= *sIt;
+    if (entity[0] != currentRightEntitySelected.toStdString()) {
+      if (currentRightEntityFilter != "") {
+	std::size_t found = entity[0].find(currentRightEntityFilter.toStdString());
+	if (found != std::string::npos) {
+	  targetListWidget->addItem(QString::fromStdString(entity[0]));
+	}
+      } else {
+	targetListWidget->addItem(QString::fromStdString(entity[0]));
+      }
+    }
+    for (int i = 0; i != targetListWidget->count(); i++) {
+      std::string currentItem = targetListWidget->item(i)->text().toStdString();
+      std::vector <std::vector <std::string> >::iterator it;
+      for (it = dataInterface->entities.begin(); it != dataInterface->entities.end(); it++) {
+	std::vector<std::string> currentEntity = *it;
+	if (currentEntity[0] == currentItem) {
+	  targetListWidget->item(i)->setToolTip(QString::fromStdString(currentEntity[1]));
+	}
+      }
+    }
+  }
 }
 
 void RelationsDialog::updateTexts() {

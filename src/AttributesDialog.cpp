@@ -136,6 +136,10 @@ AttributesDialog::AttributesDialog(QWidget *parent, DataInterface *interface,
   connect(saveCloseButton, SIGNAL(clicked()), this, SLOT(saveAndClose()));
   
   // Then we create the layout for the dialog.
+  setWindowTitle("Add / Edit Attribute");
+  //  setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+
+
   QPointer<QVBoxLayout> mainLayout = new QVBoxLayout;
   mainLayout->addWidget(informativeLabel);
   informativeLabel->setAlignment(Qt::AlignHCenter);
@@ -191,7 +195,6 @@ AttributesDialog::AttributesDialog(QWidget *parent, DataInterface *interface,
   mainLayout->addLayout(optionLayout);
 
   setLayout(mainLayout);
-  setWindowTitle("Add / Edit Attribute");
   setFixedHeight(sizeHint().height());
 
   // Now we need to fetch some text as well.
@@ -879,5 +882,57 @@ bool AttributesDialog::eventFilter(QObject *target, QEvent *event) {
   return QObject::eventFilter(target, event);
 }
 
-
-
+void AttributesDialog::reject() {
+  if (submittedLabel == EMPTY) {
+    std::vector <std::vector <std::string> >::iterator sIt;
+    if (submittedType == INCIDENT) {
+      for (std::vector<std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedIncidentAttributeCategories.size(); i++) {
+	std::vector<std::string> currentGroup = dataInterface->assignedIncidentAttributeCategories[i];
+	for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
+	  if (currentGroup[j] == ";;NEW;;") {
+	    dataInterface->assignedIncidentAttributeCategories[i].erase(dataInterface->assignedIncidentAttributeCategories[i].begin() + j);
+	  }
+	}
+      }
+      std::vector <std::vector <std::string> >::iterator it;
+      for (it = dataInterface->assignedIncidentAttributeCategories.begin();
+	   it != dataInterface->assignedIncidentAttributeCategories.end();) {
+	std::vector<std::string> currentAssigned = *it;
+	if (currentAssigned.size() < 2) {
+	  dataInterface->assignedIncidentAttributeCategories.erase(it);
+	} else {
+	  it++;
+	}
+      }
+    } else if (submittedType == ENTITY) {
+      for (std::vector<std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedEntityAttributeCategories.size(); i++) {
+	std::vector<std::string> currentGroup = dataInterface->assignedEntityAttributeCategories[i];
+	for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
+	  if (currentGroup[j] == ";;NEW;:") {
+	    dataInterface->assignedEntityAttributeCategories[i].erase(dataInterface->assignedEntityAttributeCategories[i].begin() + j);
+	  }
+	}
+	std::vector <std::vector <std::string> >::iterator it;
+	for (it = dataInterface->assignedEntityAttributeCategories.begin();
+	     it != dataInterface->assignedEntityAttributeCategories.end();) {
+	  std::vector<std::string> currentAssigned = *it;
+	  if (currentAssigned.size() < 2) {
+	    dataInterface->assignedEntityAttributeCategories.erase(it);
+	  } else {
+	    it++;
+	  }
+	}
+      }
+    }
+    QDateTime time = QDateTime::currentDateTime();
+    QString timeText = time.toString(Qt::TextDate);
+    QString newLog = timeText + " - " + "Cancelled adding new attribute";
+    logger->addToLog(newLog);
+  } else {
+    QDateTime time = QDateTime::currentDateTime();
+    QString timeText = time.toString(Qt::TextDate);
+    QString newLog = timeText + " - " + "Cancelled editing attribute " + submittedLabel;
+    logger->addToLog(newLog);
+  }
+  QDialog::reject();
+}

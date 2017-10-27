@@ -495,8 +495,33 @@ std::string EntityDialog::getNewName() {
 }
 
 void EntityDialog::cancelAndClose() {
-  disableAttributeSelection();
   if (submittedLabel == EMPTY) {
+    std::vector<std::string>::size_type eraseIndex = 0;
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedEntityAttributes.size(); i++) {
+      std::vector<std::string> currentGroup = dataInterface->assignedEntityAttributes[i];
+      for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
+	if (currentGroup[j] == ";;NEW;;") {
+	  dataInterface->assignedEntityAttributes[i].erase(dataInterface->assignedEntityAttributes[i].begin() + j);
+	}
+      }
+    }	
+    std::vector <std::vector <std::string> >::iterator it;
+    for (it = dataInterface->assignedEntityAttributes.begin(); it != dataInterface->assignedEntityAttributes.end();) {
+      std::vector<std::string> currentAssigned = *it;
+      if (currentAssigned.size() < 2) {
+	dataInterface->assignedEntityAttributes.erase(it);
+      } else {
+	it++;
+      }
+    }
+    for (it = dataInterface->entityValues.begin(); it != dataInterface->entityValues.end();) {
+      std::vector<std::string> currentValue = *it;
+      if (currentValue[1] == ";;NEW;;") {
+	dataInterface->entityValues.erase(it);
+      } else {
+	it++;
+      }
+    }
     QDateTime time = QDateTime::currentDateTime();
     QString timeText = time.toString(Qt::TextDate);
     QString newLog = timeText + " - " + "Cancelled adding new entity";
@@ -691,4 +716,36 @@ bool EntityDialog::eventFilter(QObject *target, QEvent *event) {
     }
   }  
   return QObject::eventFilter(target, event);
+}
+
+void EntityDialog::reject() {
+  if (submittedLabel == EMPTY) {
+    std::vector<std::string>::size_type eraseIndex = 0;
+    for (std::vector <std::vector <std::string> >::size_type i = 0; i != dataInterface->assignedEntityAttributes.size(); i++) {
+      std::vector<std::string> currentGroup = dataInterface->assignedEntityAttributes[i];
+      for (std::vector<std::string>::size_type j = 1; j != currentGroup.size(); j++) {
+	if (currentGroup[j] == ";;NEW;;") {
+	  dataInterface->assignedEntityAttributes[i].erase(dataInterface->assignedEntityAttributes[i].begin() + j);
+	}
+      }
+    }	
+    std::vector <std::vector <std::string> >::iterator it;
+    for (it = dataInterface->assignedEntityAttributes.begin(); it != dataInterface->assignedEntityAttributes.end();) {
+      std::vector<std::string> currentAssigned = *it;
+      if (currentAssigned.size() < 2) {
+	dataInterface->assignedEntityAttributes.erase(it);
+      } else {
+	it++;
+      }
+    }
+    for (it = dataInterface->entityValues.begin(); it != dataInterface->entityValues.end();) {
+      std::vector<std::string> currentValue = *it;
+      if (currentValue[1] == ";;NEW;;") {
+	dataInterface->entityValues.erase(it);
+      } else {
+	it++;
+      }
+    }
+  }
+  QDialog::reject();
 }

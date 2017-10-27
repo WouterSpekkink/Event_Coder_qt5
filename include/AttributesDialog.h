@@ -78,6 +78,7 @@ private slots:
   void cancelAndClose();
   void saveAndClose();
   bool eventFilter(QObject *target, QEvent *event);
+  void reject();
   
 private:
   DataInterface *dataInterface;

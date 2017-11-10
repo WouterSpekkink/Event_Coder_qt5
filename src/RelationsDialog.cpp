@@ -783,6 +783,7 @@ void RelationsDialog::saveAndClose() {
 	warningBox->setText("Relationship already exists.");
 	warningBox->setInformativeText("You cannot create two identical relationships.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
       if (dataInterface->relationships[i][0] == altLabel && currentDirectedness == UNDIRECTED) {
@@ -792,6 +793,7 @@ void RelationsDialog::saveAndClose() {
 	warningBox->setText("Relationship already exists.");
 	warningBox->setInformativeText("You cannot create two identical relationships.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -803,6 +805,7 @@ void RelationsDialog::saveAndClose() {
 	warningBox->setText("Relationship already exists.");
 	warningBox->setInformativeText("You cannot create two identical relationships.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -814,6 +817,7 @@ void RelationsDialog::saveAndClose() {
 	warningBox->setText("Relationship already exists.");
 	warningBox->setInformativeText("You cannot create two identical relationships.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -858,6 +862,7 @@ void RelationsDialog::saveAndClose() {
     warningBox->setText("Relationship incomplete.");
     warningBox->setInformativeText("You need to select a source, type and target for the relationship");
     warningBox->exec();
+    delete warningBox;
     return;
   }
 }

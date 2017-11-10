@@ -154,6 +154,7 @@ void DataInterface::readFile(const QString &fileName, const QString &sep)
       errorBox->setText(tr("<b>ERROR: Import cancelled</b>"));
       errorBox->setInformativeText("Unmatched quotes (\") were found in one of the lines of the file.");
       errorBox->exec();
+      delete errorBox;
       return;
     }
     // This boolean will indicate whether or not we find ourselves in a text field. These may hold
@@ -217,6 +218,7 @@ void DataInterface::readFile(const QString &fileName, const QString &sep)
     errorBox->setText(tr("<b>ERROR: Import cancelled</b>"));
     errorBox->setInformativeText("Something strange happened during the import. Did you set the delimiters correctly?");
     errorBox->exec();
+    delete errorBox;
     return;
   }
   // This signal is sent to the main dialog to let it know we have finished importing the file.
@@ -246,6 +248,7 @@ void DataInterface::writeSave(const QString &fileName, std::vector<std::vector <
     errorBox->setText(tr("<b>ERROR: Cannot write file</b>"));
     errorBox->setInformativeText("It appears impossible to open the file to write data.");
     errorBox->exec();
+    delete errorBox;
     return;
   }
 
@@ -1228,10 +1231,11 @@ void DataInterface::readSave(const QString &fileName) {
   }
   // We should check whether data has actually been read.
   if (header.empty() || rowData.empty()) {
-      QPointer<QMessageBox> errorBox =  new QMessageBox;
+    QPointer<QMessageBox> errorBox =  new QMessageBox;
     errorBox->setText(tr("<b>ERROR: Could not load data</b>"));
     errorBox->setInformativeText("It appears there was a problem while importing data. Perhaps your save file has been corrupted.");
     errorBox->exec();
+    delete errorBox;
     return; 
   } else {
     QString eI = QString::fromStdString(eventIndex);
@@ -1446,6 +1450,7 @@ void DataInterface::importCodes(const QString &fileName) {
 	      warningBox->setIcon(QMessageBox::Warning);
 	      warningBox->setText("WARNING: No columns were selected!");
 	      warningBox->exec();
+	      delete warningBox;
 	      return;
 	    }
 	  }
@@ -1851,6 +1856,7 @@ void DataInterface::importCodes(const QString &fileName) {
 	warningBox->setIcon(QMessageBox::Warning);
 	warningBox->setText("WARNING: Identical entries detected in current data set with current selection of columns!");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -1887,6 +1893,7 @@ void DataInterface::importCodes(const QString &fileName) {
 	warningBox->setIcon(QMessageBox::Warning);
 	warningBox->setText("WARNING: Identical entries detected in loaded save file with current selection of columns!");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -2776,7 +2783,7 @@ void DataInterface::exportData(QVector<QString> &properties, QVector<bool> &incl
   errorBox->setText(tr("<b>Files exported</b>"));
   errorBox->setInformativeText("Your files have been exported to the \"../export\" folder in the program's directory.");
   errorBox->exec();
-
+  delete errorBox;
 }
 
 

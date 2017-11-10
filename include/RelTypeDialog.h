@@ -68,8 +68,8 @@ private slots:
   bool eventFilter(QObject *target, QEvent *event);
   
 private:
-  DataInterface *dataInterface;
-  Logger *logger;
+  QPointer<DataInterface> dataInterface;
+  QPointer<Logger> logger;
   
   QPointer<QLabel> nameLabel;
   QPointer<QLabel> descriptionLabel;

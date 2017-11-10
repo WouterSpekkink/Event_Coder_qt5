@@ -162,6 +162,7 @@ void CategoryDialog::saveAndClose() {
 	  warningBox->setText("Category already exists.");
 	  warningBox->setInformativeText("You cannot create two Categories with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -174,6 +175,7 @@ void CategoryDialog::saveAndClose() {
 	  warningBox->setText("Category already exists.");
 	  warningBox->setInformativeText("You cannot create two categories with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -221,6 +223,7 @@ void CategoryDialog::saveAndClose() {
 	  warningBox->setText("Category already exists.");
 	  warningBox->setInformativeText("You cannot create two categories with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -233,6 +236,7 @@ void CategoryDialog::saveAndClose() {
 	  warningBox->setText("Category already exists.");
 	  warningBox->setInformativeText("You cannot create two categories with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -277,6 +281,7 @@ void CategoryDialog::saveAndClose() {
     warningBox->setText("No name provided.");
     warningBox->setInformativeText("You need to enter a name to save the category.");
     warningBox->exec();
+    delete warningBox;
     return;
   } else if (description == "") {
     QPointer <QMessageBox> warningBox = new QMessageBox;
@@ -285,6 +290,7 @@ void CategoryDialog::saveAndClose() {
     warningBox->setText("No description provided.");
     warningBox->setInformativeText("You need to enter a description to save the category.");
     warningBox->exec();
+    delete warningBox;
     return;
   }
 }

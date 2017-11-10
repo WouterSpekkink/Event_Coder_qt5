@@ -696,6 +696,7 @@ void AttributesDialog::saveAndClose() {
 	  warningBox->setText("Attribute already exists.");
 	  warningBox->setInformativeText("You cannot create two attributes with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -708,6 +709,7 @@ void AttributesDialog::saveAndClose() {
 	  warningBox->setText("Attribute already exists.");
 	  warningBox->setInformativeText("You cannot create two attributes with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -774,6 +776,7 @@ void AttributesDialog::saveAndClose() {
 	  warningBox->setText("Attribute already exists.");
 	  warningBox->setInformativeText("You cannot create two attributes with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -785,6 +788,7 @@ void AttributesDialog::saveAndClose() {
 	  warningBox->setText("Attribute already exists.");
 	  warningBox->setInformativeText("You cannot create two attributes with identical names.");
 	  warningBox->exec();
+	  delete warningBox;
 	  return;
 	}
       }
@@ -850,6 +854,7 @@ void AttributesDialog::saveAndClose() {
     warningBox->setText("No Label provided.");
     warningBox->setInformativeText("You need to enter a label to save the attribute.");
     warningBox->exec();
+    delete warningBox;
     return;
   } else if (description == "") {
     QPointer <QMessageBox> warningBox = new QMessageBox;
@@ -858,6 +863,7 @@ void AttributesDialog::saveAndClose() {
     warningBox->setText("No description provided.");
     warningBox->setInformativeText("You need to enter a description to save the attribute.");
     warningBox->exec();
+    delete warningBox;
     return;
   }
 }

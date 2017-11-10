@@ -80,8 +80,8 @@ private slots:
   void saveAndClose();
 
 private:
-  DataInterface *dataInterface;
-  Logger *logger;
+  QPointer<DataInterface> dataInterface;
+  QPointer<Logger> logger;
   
   QPointer<QLabel> informativeLabel;
   QPointer<QLabel> sourceLabel;

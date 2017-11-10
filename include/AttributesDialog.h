@@ -81,8 +81,8 @@ private slots:
   void reject();
   
 private:
-  DataInterface *dataInterface;
-  Logger *logger;
+  QPointer<DataInterface> dataInterface;
+  QPointer<Logger> logger;
   
   QPointer<QLabel> informativeLabel;
   QPointer<QLabel> nameLabel;

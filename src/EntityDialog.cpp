@@ -559,6 +559,7 @@ void EntityDialog::saveAndClose() {
 	warningBox->setText("Entity already exists.");
 	warningBox->setInformativeText("You cannot create two entities with identical names.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -571,6 +572,7 @@ void EntityDialog::saveAndClose() {
 	warningBox->setText("Entity already exists.");
 	warningBox->setInformativeText("You cannot create two entities with identical names.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -686,6 +688,7 @@ void EntityDialog::saveAndClose() {
     warningBox->setText("No Label provided.");
     warningBox->setInformativeText("You need to enter a label to save the entity.");
     warningBox->exec();
+    delete warningBox;
     return;
   } else if (description == "") {
     QPointer <QMessageBox> warningBox = new QMessageBox;
@@ -694,6 +697,7 @@ void EntityDialog::saveAndClose() {
     warningBox->setText("No description provided.");
     warningBox->setInformativeText("You need to enter a description to save the entity.");
     warningBox->exec();
+    delete warningBox;
     return;
   }
 }

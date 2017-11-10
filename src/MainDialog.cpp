@@ -433,6 +433,7 @@ void MainDialog::getFile() {
 	selectSeparatorComboBox->setEnabled(false);
       }
     }
+    delete warningBox;
   } else {
     QString file = QFileDialog::getOpenFileName(this, tr("Open File"),"","Comma Delimited Files(*.csv)");
     if(!file.trimmed().isEmpty()) {
@@ -543,6 +544,7 @@ void MainDialog::loadSession() {
 	logger->addToLog(newLog);
       }
     }
+    delete warningBox;
   } else {
    QString QloadFile = QFileDialog::getOpenFileName(this, tr("Load File"),"", tr("sav files (*.sav)"));
    if (!QloadFile.trimmed().isEmpty()) {

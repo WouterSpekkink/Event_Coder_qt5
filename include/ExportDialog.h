@@ -55,7 +55,7 @@ private slots:
   void exportData();
   
 private:
-  DataInterface *dataInterface;
+  QPointer<DataInterface> dataInterface;
   QPointer<QLabel> informativeLabel;
   QPointer<QLabel> incidentsLabel;
   QPointer<QLabel> incidentIdLabel;

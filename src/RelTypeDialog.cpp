@@ -190,6 +190,7 @@ void RelTypeDialog::saveAndClose() {
 	warningBox->setText("Relationship types already exists.");
 	warningBox->setInformativeText("You cannot create two relationship types with identical labels.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -202,6 +203,7 @@ void RelTypeDialog::saveAndClose() {
 	warningBox->setText("Relationship type already exists.");
 	warningBox->setInformativeText("You cannot create two relationship types with identical labels.");
 	warningBox->exec();
+	delete warningBox;
 	return;
       }
     }
@@ -271,6 +273,7 @@ void RelTypeDialog::saveAndClose() {
     warningBox->setText("No label provided.");
     warningBox->setInformativeText("You need to enter a label to save the relationship type.");
     warningBox->exec();
+    delete warningBox;
     return;
   } else if (description == "") {
     QPointer <QMessageBox> warningBox = new QMessageBox;
@@ -279,6 +282,7 @@ void RelTypeDialog::saveAndClose() {
     warningBox->setText("No description provided.");
     warningBox->setInformativeText("You need to enter a description to save the new relationship type.");
     warningBox->exec();
+    delete warningBox;
     return;
   }
 }
